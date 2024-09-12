@@ -1,0 +1,21 @@
+#calculatorBox .displayText {
+  width: 100%;
+  color: black;
+  text-align: right;
+  padding-right: 1%;
+  font-size: 14pt;
+  border: none;
+}
+
+#calculatorBox .displayText.equation {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+#calculatorBox .displayText.result {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  font-size: 16pt;
+  font-weight: bold;
+  border-top: 1px solid #333;
+}

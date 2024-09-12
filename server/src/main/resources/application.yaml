@@ -1,0 +1,23 @@
+server:
+  port: 8090
+spring:
+  datasource:
+#    url: jdbc:h2:file:./test/src/main/resources/invext
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties.hibernate.dialect: org.hibernate.dialect.H2Dialect
+    hibernate.ddl-auto: update
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-ui
+jwt:
+  secret:
+    key: 123456
+
+#cron: "0 0/1 * * * *" # runs every 1 minute

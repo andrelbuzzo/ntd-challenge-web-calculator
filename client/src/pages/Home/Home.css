@@ -1,0 +1,32 @@
+#application {
+  color: white;
+}
+
+#application header,
+#application footer {
+  text-align: center;
+}
+
+#application footer h4 a {
+  margin-right: 10px;
+  font-size: 18pt;
+}
+
+#calculatorBox {
+  margin: 10% 0;
+  background-color: gray;
+  border-radius: 10px;
+}
+
+#calculatorBox button {
+  border-radius: 0;
+  font-size: 16pt;
+  line-height: 44px;
+}
+
+#calculatorBox button.btn-warning {
+  font-size: 12pt;
+}
+#calculatorBox button.btn-info {
+  font-size: 22pt;
+}
