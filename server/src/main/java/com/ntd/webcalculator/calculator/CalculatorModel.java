@@ -1,7 +1,6 @@
-package com.ntd.webcalculator;
+package com.ntd.webcalculator.calculator;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

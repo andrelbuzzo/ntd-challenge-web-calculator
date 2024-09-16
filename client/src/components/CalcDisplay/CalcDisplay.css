@@ -4,7 +4,9 @@
   text-align: right;
   padding-right: 1%;
   font-size: 14pt;
+  background-color: #e0e0e0;
   border: none;
+  border: 1px solid #333;
 }
 
 #calculatorBox .displayText.equation {
@@ -18,4 +20,5 @@
   font-size: 16pt;
   font-weight: bold;
   border-top: 1px solid #333;
+  border-top: none;
 }

@@ -9,8 +9,8 @@ import API from "../../utils/API";
 import "./Calculator.css";
 
 export default class Calculator extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       input: "",
@@ -20,13 +20,22 @@ export default class Calculator extends Component {
       param2: "",
       APIFunction: null,
       onParam1: true,
-      error: false
+      error: false,
+      loggedIn: localStorage.getItem('user') ? true : false
     };
 
     this.resetValues = this.resetValues.bind(this);
     this.getAPIFunction = this.getAPIFunction.bind(this);
     this.performCalculation = this.performCalculation.bind(this);
     this.handleOnClick = this.handleOnClick.bind(this);
+    this.handleLogoutClick = this.handleLogoutClick.bind(props);
+
+    this.checkIfLoggedIn(props)
+  }
+
+  checkIfLoggedIn(props) {
+    if (!this.state.loggedIn)
+      props.history.push('/')
   }
 
   resetValues(error) {
@@ -47,7 +56,7 @@ export default class Calculator extends Component {
     console.log(value);
     let APIFunction = null;
 
-    this.state.operator = value;
+    this.setState({ operator: value });
     
     APIFunction = API.calculate;
 
@@ -55,7 +64,7 @@ export default class Calculator extends Component {
   }
 
   performCalculation(usedEqualSign, value) {
-    API.calculate(this.state.operator, this.state.param1, this.state.param2)
+    API.calculate(this.state.operator, this.state.param1, this.state.param2, JSON.parse(localStorage.getItem('user')).token)
     .then(response => {
       console.log("response")
       console.log(response)
@@ -134,6 +143,11 @@ export default class Calculator extends Component {
     }
   }
 
+  handleLogoutClick(event) {
+    event.preventDefault();
+    this.history.push('/')
+  }
+
   render() {
     return (
       <div>
@@ -158,6 +172,8 @@ export default class Calculator extends Component {
             />
           </Col>
         </Row>
+
+        <input className={'inputButton'} type="button" onClick={this.handleLogoutClick} value={'Log out'} />
       </div>
     );
   }

@@ -1,4 +1,4 @@
-package com.ntd.webcalculator;
+package com.ntd.webcalculator.calculator;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -7,13 +7,14 @@ import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
-@RequestMapping("/api/calculator")
 public class CalculatorController {
 
 	CalculatorService calculatorService;
+	StringGenerationService stringGenerationService;
 
-	public CalculatorController(CalculatorService calculatorService) {
+	public CalculatorController(CalculatorService calculatorService, StringGenerationService stringGenerationService) {
 		this.calculatorService = calculatorService;
+		this.stringGenerationService = stringGenerationService;
 	}
 
 	/*@GetMapping("/add")
@@ -68,7 +69,7 @@ public class CalculatorController {
 //		return "base-layout";
 //	}
 
-	@GetMapping
+	@GetMapping("/api/v1/calculator")
 	public ResponseEntity<CalculatorModel> index(
 			@RequestParam(value = "operator") String operator,
 			@RequestParam(value = "leftOperand") String leftOperand,
@@ -100,11 +101,29 @@ public class CalculatorController {
 		try {
 			Double result = calculatorService.calculateResult(leftNumber, rightNumber, operator);
 			log.info("result: {}", result);
-			log.info(new CalculatorModel(leftNumber, rightNumber, operator, result));
 
-			return ResponseEntity.ok(new CalculatorModel(leftNumber, rightNumber, operator, result));
+			CalculatorModel finalResult = new CalculatorModel(leftNumber, rightNumber, operator, result);
+			log.info(finalResult);
+
+			return ResponseEntity.ok(finalResult);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new CalculatorModel(operator), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/api/v1/generateString")
+	public ResponseEntity<String> generateString() {
+		log.info("Generate String ->");
+
+		String result = "";
+
+		try {
+			result = stringGenerationService.generateString();
+			log.info("result: {}", result);
+
+			return ResponseEntity.ok(result);
+		} catch (Exception e) {
+			return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
 		}
 	}
 
