@@ -1,4 +1,4 @@
-package com.ntd.webcalculator;
+package com.ntd.webcalculator.calculator;
 
 import org.springframework.stereotype.Service;
 

@@ -1,0 +1,189 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+main {
+  padding: 5rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+code {
+  background: #fafafa;
+  border-radius: 5px;
+  padding: 0.75rem;
+  font-family:
+    Menlo,
+    Monaco,
+    Lucida Console,
+    Courier New,
+    monospace;
+}
+
+input[type='button'] {
+  border: none;
+  background: cornflowerblue;
+  color: white;
+  padding: 12px 24px;
+  margin: 8px;
+  font-size: 24px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.box {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 50vh;
+}
+.login-form {
+  min-width: 250px;
+  max-width: 400px;
+	border-radius: 24px;
+	padding: 15px;
+  color: #333;
+	background-color: white;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.login-form h1 {
+	text-align: center;
+	font-size: 40px;
+	margin-top: 35px;
+  color: #333;
+}
+
+.login-form input[type = "text"] {
+	margin-top: 30px;
+}
+.login-form input[type = "password"] {
+	margin-top: 10px;
+}
+
+.login-form input[type = "submit"] {
+	background-color:  #E0E0E0;
+	background-image: linear-gradient(19deg, #21D4FD 0%, #B721FF 100%);
+	width: 100%;
+	color: white;
+  border: none;
+	margin-top: 35px;
+  cursor: pointer;
+	padding: 10px;
+  font-size: 20px;
+	font-weight: bold;
+	border-radius: 24px;
+	transition: 0.25s;
+}
+.login-form input[type = "submit"]:hover {
+	opacity: 0.8;
+}
+:focus-visible{
+  outline: none !important;
+ }
+.login-form input[type = "text"]:focus, .login-form input[type = "password"]:focus {
+ 	border: 2px #21D4FD solid;
+ }
+.login-form input[type = "text"], .login-form input[type = "password"] {
+	width: 100%;
+	border: none;
+	border-radius: 24px;
+  font-size: 16px;
+  font-family: 'Raleway', sans-seriff;
+	background-color: gainsboro;
+	padding: 15px;
+}
+
+.loginContainer {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.mainContainer {
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #535199;
+  margin: 0 200px;
+  padding: 10px 30px 20px;
+  border-radius: 10px;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  font-size: 64px;
+  font-weight: bolder;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultContainer,
+.historyItem {
+  flex-direction: row;
+  display: flex;
+  width: 300px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.historyContainer {
+  flex-direction: column;
+  display: flex;
+  height: 200px;
+  align-items: center;
+  flex-grow: 5;
+  justify-content: flex-start;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  color: #333;
+}
+
+.inputContainer > .errorLabel {
+  color: red;
+  font-size: 12px;
+}
+
+.inputBox {
+  height: 48px;
+  width: 400px;
+  font-size: large;
+  border-radius: 8px;
+  border: 1px solid grey;
+  padding-left: 8px;
+}
