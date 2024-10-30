@@ -16,8 +16,6 @@ export default {
     axios.get(`/api/v1/calculator/divide?param1=${param1}&param2=${param2}`),
   calculate: (operator, leftOperand, rightOperand, token) => 
     axios.get(`/api/v1/calculator?operator=${encodeURIComponent(operator)}&leftOperand=${leftOperand}&rightOperand=${rightOperand}`, {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
+      headers: {'Authorization': 'Bearer ' + token}
     })
 };
