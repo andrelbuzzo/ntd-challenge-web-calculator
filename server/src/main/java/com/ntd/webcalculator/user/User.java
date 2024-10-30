@@ -7,10 +7,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.NumberFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,6 +38,9 @@ public class User implements UserDetails {
 
 	@Enumerated(EnumType.STRING)
 	private Role role;
+
+	@NumberFormat(style = NumberFormat.Style.CURRENCY, pattern = "#,###.##")
+	private BigDecimal balance = new BigDecimal(10.00);
 
 	public User(String username, String password, Role role, Status status) {
 		this.username = username;
