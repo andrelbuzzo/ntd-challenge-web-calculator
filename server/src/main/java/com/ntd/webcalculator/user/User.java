@@ -29,6 +29,8 @@ public class User implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	private String name;
+
 	private String username; // email
 
 	private String password;
@@ -40,13 +42,14 @@ public class User implements UserDetails {
 	private Role role;
 
 	@NumberFormat(style = NumberFormat.Style.CURRENCY, pattern = "#,###.##")
-	private BigDecimal balance = new BigDecimal(10.00);
+	private BigDecimal balance = new BigDecimal("10.00");
 
-	public User(String username, String password, Role role, Status status) {
+	public User(String name, String username, String password, Role role) {
+		this.name = name;
 		this.username = username;
 		this.password = password;
-		this.role = role;
-		this.status = status;
+		this.role = role != null ? role : Role.USER;
+		this.status = Status.ACTIVE;
 	}
 
 	@Override
@@ -54,10 +57,10 @@ public class User implements UserDetails {
 		return List.of(new SimpleGrantedAuthority(role.name()));
 	}
 
-	@Override
-	public String getUsername() {
-		return this.username;
-	}
+//	@Override
+//	public String getUsername() {
+//		return this.username;
+//	}
 
 	@Override
 	public boolean isAccountNonExpired() {

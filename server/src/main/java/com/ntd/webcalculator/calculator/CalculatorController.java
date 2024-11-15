@@ -1,14 +1,18 @@
 package com.ntd.webcalculator.calculator;
 
+import com.ntd.webcalculator.enums.OperationType;
+import com.ntd.webcalculator.record.RecordService;
 import com.ntd.webcalculator.user.User;
 import com.ntd.webcalculator.user.UserService;
+import com.ntd.webcalculator.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 
@@ -18,60 +22,9 @@ import java.math.BigDecimal;
 public class CalculatorController {
 
     private final CalculatorService calculatorService;
+    private final RecordService recordService;
     private final StringGenerationService stringGenerationService;
     private final UserService userService;
-
-	/*@GetMapping("/add")
-	public ResponseEntity<CalculatorModel> add(@RequestParam(value = "param1", required = true) String param1,
-	                                           @RequestParam(value = "param2", required = true) String param2) {
-		try {
-			log.info(":: Add Operation ::");
-			return ResponseEntity.ok(Calculator.add(Double.parseDouble(param1), Double.parseDouble(param2)));
-		} catch (Exception e) {
-			return new ResponseEntity<>(new CalculatorModel("+"), HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@GetMapping("/subtract")
-	public ResponseEntity<CalculatorModel> subtract(@RequestParam(value = "param1", required = true) String param1,
-	                                                @RequestParam(value = "param2", required = true) String param2) {
-		try {
-			return ResponseEntity.ok(Calculator.subtract(Double.parseDouble(param1), Double.parseDouble(param2)));
-		} catch (Exception e) {
-			return new ResponseEntity<>(new CalculatorModel("-"), HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@GetMapping("/multiply")
-	public ResponseEntity<CalculatorModel> multiply(@RequestParam(value = "param1", required = true) String param1,
-	                                                @RequestParam(value = "param2", required = true) String param2) {
-		try {
-			return ResponseEntity.ok(Calculator.multiply(Double.parseDouble(param1), Double.parseDouble(param2)));
-		} catch (Exception e) {
-			return new ResponseEntity<>(new CalculatorModel("*"), HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@GetMapping("/divide")
-	public ResponseEntity<CalculatorModel> divide(@RequestParam(value = "param1", required = true) String param1,
-	                                              @RequestParam(value = "param2", required = true) String param2) {
-		try {
-			Double denominator = Double.parseDouble(param2);
-			if (denominator == 0.0) {
-				throw new ArithmeticException();
-			}
-			return ResponseEntity.ok(Calculator.divide(Double.parseDouble(param1), Double.parseDouble(param2)));
-		} catch (Exception e) {
-			return new ResponseEntity<>(new CalculatorModel("/"), HttpStatus.BAD_REQUEST);
-		}
-	}*/
-
-//	@GetMapping("/")
-//	public String index(Model model) {
-//		model.addAttribute("operator", "+");
-//		model.addAttribute("view", "views/calculatorForm");
-//		return "base-layout";
-//	}
 
     @GetMapping("/api/v1/calculator")
     public ResponseEntity<CalculatorModel> index(
@@ -80,9 +33,7 @@ public class CalculatorController {
             @RequestParam(value = "leftOperand") String leftOperand,
             @RequestParam(value = "rightOperand") String rightOperand
     ) {
-        log.info("Equation [leftOperand=" + leftOperand +
-                ", operator=" + operator +
-                ", rightOperand=" + rightOperand + "]");
+        log.info("Equation [leftOperand={}, operator={}, rightOperand={}]", leftOperand, operator, rightOperand);
 
         double leftNumber;
         double rightNumber;
@@ -100,55 +51,73 @@ public class CalculatorController {
         }
 
         if (operator.equals("/") && rightNumber == 0.0) {
-            throw new ArithmeticException();
+            return new ResponseEntity<>(new CalculatorModel(leftNumber, rightNumber, operator, null, Constants.ERROR_DIVISION_BY_ZERO), HttpStatus.BAD_REQUEST);
         }
 
-        if (operator.equals("sqrt") && leftNumber == 0.0) {
-            throw new ArithmeticException();
+        if (operator.equals("sqrt") && rightNumber <= 0.0) {
+            return new ResponseEntity<>(new CalculatorModel(leftNumber, rightNumber, operator, null, Constants.ERROR_SQRT_NEGATIVE), HttpStatus.BAD_REQUEST);
         }
+
+        User user = userService.loadUserByUsername(auth.getName());
+        BigDecimal credits = userService.checkBalance(user, operator);
+        log.info(credits);
+
+        CalculatorModel finalResult = new CalculatorModel(Constants.ERROR_INSUFFICIENT_CREDITS);
 
         try {
-            User user = userService.loadUserByUsername(auth.getName());
-            BigDecimal credits = userService.checkBalance(user, operator);
-            log.info(credits);
-
             if (credits.compareTo(BigDecimal.ZERO) <= 0) {
-                return new ResponseEntity<>(new CalculatorModel("Insufficient credits to perform operation"), HttpStatus.LOCKED);
+                credits = user.getBalance();
+                return new ResponseEntity<>(finalResult, HttpStatus.LOCKED);
             }
+
+            user.setBalance(credits);
+            userService.update(user);
 
             Double result = calculatorService.calculateResult(leftNumber, rightNumber, operator);
             log.info("result: {}", result);
 
-            CalculatorModel finalResult = new CalculatorModel(leftNumber, rightNumber, operator, result);
+            finalResult = new CalculatorModel(leftNumber, rightNumber, operator, result, Constants.OPERATION_SUCCESSFUL);
             log.info(finalResult);
 
             return ResponseEntity.ok(finalResult);
         } catch (Exception e) {
-            return new ResponseEntity<>(new CalculatorModel(operator), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new CalculatorModel("ERROR: " + e.getMessage()), HttpStatus.BAD_REQUEST);
+        } finally {
+            recordService.save(operator, user, credits, finalResult.toString());
         }
     }
 
-    @GetMapping("/api/v1/generateString")
+    @GetMapping("/api/v1/generate-string")
     public ResponseEntity<String> generateString(Authentication auth) {
         log.info("Generate String ->");
 
         String str;
 
-        try {
-            User user = userService.loadUserByUsername(auth.getName());
-            BigDecimal credits = userService.checkBalance(user, "stringGen");
-            log.info(credits);
+        User user = userService.loadUserByUsername(auth.getName());
+        BigDecimal credits = userService.checkBalance(user, "stringGen");
+        log.info(credits);
 
+        String finalResult = Constants.ERROR_INSUFFICIENT_CREDITS;
+
+        try {
             if (credits.compareTo(BigDecimal.ZERO) <= 0) {
-                return new ResponseEntity<>("Insufficient credits to perform operation", HttpStatus.LOCKED);
+                credits = user.getBalance();
+                return new ResponseEntity<>(finalResult, HttpStatus.LOCKED);
             }
+
+            user.setBalance(credits);
+            userService.update(user);
 
             str = stringGenerationService.generateString();
             log.info("result: {}", str);
 
+            finalResult = str;
+
             return ResponseEntity.ok(str);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } finally {
+            recordService.save(OperationType.RANDOM_STRING.name(), user, credits, finalResult);
         }
     }
 
