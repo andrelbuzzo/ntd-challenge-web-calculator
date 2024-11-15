@@ -28,8 +28,7 @@ export default class Calculator extends Component {
     this.getAPIFunction = this.getAPIFunction.bind(this);
     this.performCalculation = this.performCalculation.bind(this);
     this.handleOnClick = this.handleOnClick.bind(this);
-    this.handleLogoutClick = this.handleLogoutClick.bind(props);
-
+    
     this.checkIfLoggedIn(props)
   }
 
@@ -143,11 +142,6 @@ export default class Calculator extends Component {
     }
   }
 
-  handleLogoutClick(event) {
-    event.preventDefault();
-    this.history.push('/')
-  }
-
   render() {
     return (
       <div>
@@ -173,7 +167,6 @@ export default class Calculator extends Component {
           </Col>
         </Row>
 
-        <input className={'inputButton'} type="button" onClick={this.handleLogoutClick} value={'Log out'} />
       </div>
     );
   }

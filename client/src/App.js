@@ -11,15 +11,33 @@ import Login from "./pages/Login/Login";
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      loggedIn: localStorage.getItem('user') ? true : false
+    };
+    this.handleLogoutClick = this.handleLogoutClick.bind(props);
+  }
+
+  handleLogoutClick(event) {
+    event.preventDefault();
+    localStorage.clear();
+    this.history.push('/');
   }
 
   render() {
+    const isLoggedIn = this.state.loggedIn;
+    let btnLogout;
+    if (isLoggedIn) {
+      btnLogout = <div className="btn-logout">
+                    <input className={'inputButton'} type="button" onClick={this.handleLogoutClick} value={'Log out'} />
+                  </div>
+    }
+
     return (
       <Router >
         <div id="application">
           <header>
             <h1>NTD Challenge - Arithmetic Calculator REST API</h1>
+            {btnLogout}
           </header>
 
           <Switch>

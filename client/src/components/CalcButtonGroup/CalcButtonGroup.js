@@ -33,7 +33,7 @@ const CalcButtonGroup = props => {
         <ButtonGroup>
           <CalcButton
             bsStyle="info"
-            label="÷"
+            label="√"
             handleOnClick={props.handleOnClick}
           />
         </ButtonGroup>
@@ -64,7 +64,7 @@ const CalcButtonGroup = props => {
         <ButtonGroup>
           <CalcButton
             bsStyle="info"
-            label="*"
+            label="÷"
             handleOnClick={props.handleOnClick}
           />
         </ButtonGroup>
@@ -95,7 +95,7 @@ const CalcButtonGroup = props => {
         <ButtonGroup>
           <CalcButton
             bsStyle="info"
-            label="-"
+            label="*"
             handleOnClick={props.handleOnClick}
           />
         </ButtonGroup>
@@ -127,19 +127,31 @@ const CalcButtonGroup = props => {
           <ButtonGroup>
             <CalcButton
               bsStyle="info"
-              label="+"
+              label="-"
               handleOnClick={props.handleOnClick}
             />
           </ButtonGroup>
         </ButtonGroup>
       </Col>
       
-      <Col xs={12} md={12} className="buttonCol">
+      <Col xs={9} md={9} className="buttonCol">
         <ButtonGroup justified>
           <ButtonGroup>
             <CalcButton
               bsStyle="success"
               label="="
+              handleOnClick={props.handleOnClick}
+            />
+          </ButtonGroup>
+        </ButtonGroup>
+      </Col>
+
+      <Col xs={3} md={3} className="buttonCol">
+        <ButtonGroup justified>
+          <ButtonGroup>
+            <CalcButton
+              bsStyle="info"
+              label="+"
               handleOnClick={props.handleOnClick}
             />
           </ButtonGroup>

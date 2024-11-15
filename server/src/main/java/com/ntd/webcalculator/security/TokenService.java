@@ -25,8 +25,7 @@ public class TokenService {
 		final String bearer = "Bearer ";
 		if (bearerToken == null || !bearerToken.startsWith(bearer))
 			throw new JWTVerificationException("Invalid Authorization Header");
-		String token = bearerToken.substring(bearer.length());
-		return token;
+        return bearerToken.substring(bearer.length());
 	}
 
 	public String getSubjectFrom(String token) {
@@ -39,13 +38,12 @@ public class TokenService {
 	public String generateToken(User user) {
 		Algorithm algorithm = Algorithm.HMAC256(secret.getBytes());
 		Instant expiration = generateExpirationTimeIn(10);  // expires in 10 min
-		String token = JWT.create()
-				.withSubject(user.getUsername())
-				.withExpiresAt(expiration)
-				.withIssuer("WebCalculator-API")
-				.withClaim("roles", user.getRole().name())
-				.sign(algorithm);
-		return token;
+        return JWT.create()
+                .withSubject(user.getUsername())
+                .withExpiresAt(expiration)
+                .withIssuer("WebCalculator-API")
+                .withClaim("roles", user.getRole().name())
+                .sign(algorithm);
 	}
 
 	private Instant generateExpirationTimeIn(int minutes) {

@@ -2,19 +2,22 @@ package com.ntd.webcalculator.calculator;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class CalculatorModel {
     private Double leftOperand;
     private Double rightOperand;
     private String operation;
-    private final Double result;
+    private Double result;
+    private String message;
 
-    public CalculatorModel(String operation) {
-        this(0.0d, 0.0d, operation, 0.0d);
+    public CalculatorModel(String message) {
+        this.message = message;
     }
 
     @Override

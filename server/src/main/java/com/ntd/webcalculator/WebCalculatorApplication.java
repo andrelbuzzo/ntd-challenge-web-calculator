@@ -22,11 +22,11 @@ public class WebCalculatorApplication {
             System.out.println("Running");
             String defaultPswd = "123456";
 
-            if (userService.findAllByRole(Role.ADMIN).isEmpty()) {
+            if (userService.findAllByRole(Role.ADMIN, null).isEmpty()) {
 
-                userService.save(new User("admin@ntd.com", defaultPswd, Role.ADMIN, Status.ACTIVE));
+                userService.save(new User("Admin", "admin@ntd.com", defaultPswd, Role.ADMIN));
                 for (int i = 1; i <= 10; i++) {
-                    userService.save(new User("user" + i + "@ntd.com", defaultPswd, Role.USER, Status.ACTIVE));
+                    userService.save(new User("User " + i, "user" + i + "@ntd.com", defaultPswd, null));
                 }
             }
         };
