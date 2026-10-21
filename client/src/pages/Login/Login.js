@@ -1,8 +1,10 @@
 import "./Login.css";
 import React, { useState } from 'react'
 import API from "../../utils/API";
+import { useNavigate } from "react-router-dom";
 
 const Login = (props) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -12,18 +14,19 @@ const Login = (props) => {
 
   const onButtonClick = (event) => {
     event.preventDefault()
+    const normalizedEmail = email.trim()
     // Set initial error values to empty
     setEmailError('')
     setPasswordError('')
     setFormError('')
   
     // Check if the user has entered both fields correctly
-    if ('' === email) {
+    if ('' === normalizedEmail) {
       setEmailError('Please enter your email')
       return
     }
   
-    if (!/^[\w-]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+    if (!/^[\w-]+@([\w-]+\.)+[\w-]{2,4}$/.test(normalizedEmail)) {
       setEmailError('Please enter a valid email')
       return
     }
@@ -51,7 +54,8 @@ const Login = (props) => {
         token: response.data.token
       }))
       window.dispatchEvent(new Event('auth-changed'))
-      props.history.replace('/home')
+      if (props.history?.replace) props.history.replace('/home')
+      else navigate('/home', { replace: true })
     })
     .catch((error) => {
       const message = error.response?.data?.message || 'Wrong email or password'

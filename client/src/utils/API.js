@@ -1,11 +1,20 @@
 import axios from "axios";
 
+const getStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
+};
+
 const api = axios.create({
   baseURL: "/api/v1"
 });
 
 api.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const user = getStoredUser();
   if (user?.token) {
     config.headers.Authorization = `Bearer ${user.token}`;
   }

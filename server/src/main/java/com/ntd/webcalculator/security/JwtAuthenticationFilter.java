@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,15 +43,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String token = tokenService.getTokenFrom(authorizationHeader);
 			String userUsername = tokenService.getSubjectFrom(token);
 			UserDetails user = userService.loadUserByUsername(userUsername);
+			if (!user.isEnabled()) {
+				throw new JWTVerificationException("User account is inactive");
+			}
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userUsername, null, user.getAuthorities());
 			authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 			filterChain.doFilter(request, response);
-		} catch (JWTVerificationException ex) {
+		} catch (JWTVerificationException | UsernameNotFoundException ex) {
 			log.warn("JWT validation failed: {}", ex.getMessage());
+			SecurityContextHolder.clearContext();
 			response.setHeader("error", ex.getMessage());
-			//response.sendError(HttpStatus.FORBIDDEN.value());
-			response.setStatus(HttpStatus.FORBIDDEN.value());
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			Map<String, String> error = new HashMap<>();
 			error.put("error", ex.getMessage());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);

@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Alert, Button, Form, InputGroup, Spinner, Table } from "react-bootstrap";
 import API from "../../utils/API";
+import { useNavigate } from "react-router-dom";
 import "./Records.css";
 
 const formatMoney = (value) => Number(value || 0).toFixed(2);
 
-const Records = ({ history }) => {
+const Records = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState({ content: [], page: 0, size: 10, totalPages: 0, totalElements: 0 });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("createdAt,desc");
@@ -18,11 +20,11 @@ const Records = ({ history }) => {
     API.records({ page, search, sort })
       .then(({ data: response }) => setData(response))
       .catch((requestError) => {
-        if (requestError.response?.status === 401) history.replace("/");
+        if (requestError.response?.status === 401) navigate("/", { replace: true });
         setError(requestError.response?.data?.message || "Não foi possível carregar o histórico.");
       })
       .finally(() => setLoading(false));
-  }, [history, search, sort]);
+  }, [navigate, search, sort]);
 
   useEffect(() => { loadRecords(0); }, [loadRecords]);
 
@@ -35,7 +37,7 @@ const Records = ({ history }) => {
     <main className="records-page">
       <div className="records-heading">
         <div><p className="eyebrow">ATIVIDADE</p><h2>Histórico de operações</h2><p className="muted-copy">Consulte e gerencie seus últimos cálculos.</p></div>
-        <Button variant="outline-dark" onClick={() => history.push("/home")}>Nova operação</Button>
+        <Button variant="outline-dark" onClick={() => navigate("/home")}>Nova operação</Button>
       </div>
       <div className="records-toolbar">
         <InputGroup>
