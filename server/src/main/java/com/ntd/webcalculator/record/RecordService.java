@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -21,42 +19,38 @@ public class RecordService {
     private final OperationService operationService;
     private final RecordRepository recordRepository;
 
-    public List<Record> filter(String operationType, User userId, Pageable paging) {
+    public Page<RecordResponse> filter(String search, String operationType, User user, Pageable paging) {
         Page<Record> records;
-
-        if (operationType != null) {
-            if (userId != null) {
-                records = recordRepository.findAllByOperationTypeAndUser(operationType, userId, paging);
-            } else {
-                records = recordRepository.findAllByOperationType(operationType, paging);
-            }
-        } else if (userId != null) {
-            records = recordRepository.findAllByUser(userId, paging);
+        if (search != null && !search.isBlank()) {
+            records = recordRepository.searchByUser(user, search.trim(), paging);
+        } else if (operationType != null && !operationType.isBlank()) {
+            records = recordRepository.findAllByOperationTypeAndUserAndDeletedFalse(
+                    operationType, user, paging);
         } else {
-            records = recordRepository.findAll(paging);
+            records = recordRepository.findAllByUserAndDeletedFalse(user, paging);
         }
-
-        return records.getContent();
+        return records.map(RecordResponse::from);
     }
 
     @Transactional
-    public void save(String operator, User user, BigDecimal credits, String finalResult) {
+    public void save(String operator, User user, BigDecimal amount,
+                     BigDecimal userBalance, String finalResult) {
         OperationType operationType = operationService.checkOperation(operator);
-        Record record = new Record(operationType.name(), operationType.cost(), user, credits,
+        Record record = new Record(operationType.name(), operationType.cost(), user, amount, userBalance,
                 finalResult);
         recordRepository.save(record);
     }
 
     @Transactional
-    public boolean delete(UUID id, boolean delete) {
-        Optional<Record> record = recordRepository.findById(id);
-        if (record.isPresent()) {
-            Record entity = record.get();
-            entity.deleted = delete;
+    public boolean delete(UUID id, User user, boolean delete) {
+        return recordRepository.findByIdAndUser(id, user).map(entity -> {
+            if (entity.isDeleted() == delete) {
+                return true;
+            }
+            entity.setDeleted(delete);
             recordRepository.save(entity);
             return true;
-        }
-        return false;
+        }).orElse(false);
     }
 
 }

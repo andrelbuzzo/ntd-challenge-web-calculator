@@ -36,3 +36,6 @@
 #calculatorBox button.btn-info {
   font-size: 22pt;
 }
+.page-shell { max-width: 1120px; padding-bottom: 70px; padding-top: 52px; }
+.home-aside { padding: 52px 12px 0 34px; } .eyebrow { color: #a15b36; font-size: .7rem; font-weight: 700; letter-spacing: .14em; margin: 0; } .home-aside h2 { color: #292622; font-size: 1.7rem; line-height: 1.15; margin: 10px 0 12px; } .muted-copy { color: #756f67; line-height: 1.6; }
+.tip-row { align-items: center; border-top: 1px solid #e6e2dc; display: flex; gap: 14px; margin-top: 20px; padding-top: 14px; } .tip-row span { color: #a15b36; font-size: .75rem; font-weight: 700; } .tip-row p { color: #4d4842; font-size: .88rem; margin: 0; }

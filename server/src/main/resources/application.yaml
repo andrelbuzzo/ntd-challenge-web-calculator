@@ -1,23 +1,20 @@
 server:
-  port: 8090
+  port: ${SERVER_PORT:8090}
 spring:
   datasource:
-    url: jdbc:h2:file:./server/src/main/resources/ntd
-#    url: jdbc:h2:mem:mydb
-    username: sa
-    password:
-    driverClassName: org.h2.Driver
+    url: ${DB_URL:jdbc:h2:file:./data/ntd}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driverClassName: ${DB_DRIVER:org.h2.Driver}
   jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
-#    properties.hibernate.dialect: org.hibernate.dialect.H2Dialect
-    hibernate.ddl-auto: create
+    hibernate.ddl-auto: ${JPA_DDL_AUTO:update}
     defer-datasource-initialization: true
+    open-in-view: false
   h2:
-    console:
-      enabled: true
-      path: /h2
+    console.enabled: ${H2_CONSOLE_ENABLED:false}
 jwt:
   secret:
-    key: 123456
-
-#cron: "0 0/1 * * * *" # runs every 1 minute
+    key: ${JWT_SECRET:local-development-secret-change-before-deployment}
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3001}

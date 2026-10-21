@@ -42,3 +42,9 @@
 .mb-10 {
   margin-bottom: 10px;
 }
+
+#application > header { align-items: center; background: #292622; color: #fff; display: flex; gap: 28px; padding: 16px max(24px, calc((100vw - 1180px) / 2)); }
+#application > header h1 { flex: 1; font-size: .9rem; font-weight: 600; letter-spacing: .03em; margin: 0; }
+.app-nav { display: flex; gap: 18px; } .app-nav a { color: #d8d0c7; font-size: .85rem; } .app-nav a:hover { color: #fff; text-decoration: none; }
+.btn-logout { margin: 0; } .btn-logout .inputButton { background: transparent; border: 1px solid #766e65; border-radius: 6px; color: #fff; padding: 5px 10px; }
+@media (max-width: 680px) { #application > header { flex-wrap: wrap; } #application > header h1 { flex-basis: 100%; } .app-nav { order: 3; } }

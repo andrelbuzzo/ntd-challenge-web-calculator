@@ -1,27 +1,32 @@
 import "./Login.css";
 import React, { useState } from 'react'
 import API from "../../utils/API";
+import { useNavigate } from "react-router-dom";
 
 const Login = (props) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
-  const [loggedIn, setLoggedIn] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [formError, setFormError] = useState('')
 
   const onButtonClick = (event) => {
     event.preventDefault()
+    const normalizedEmail = email.trim()
     // Set initial error values to empty
     setEmailError('')
     setPasswordError('')
+    setFormError('')
   
     // Check if the user has entered both fields correctly
-    if ('' === email) {
+    if ('' === normalizedEmail) {
       setEmailError('Please enter your email')
       return
     }
   
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+    if (!/^[\w-]+@([\w-]+\.)+[\w-]{2,4}$/.test(normalizedEmail)) {
       setEmailError('Please enter a valid email')
       return
     }
@@ -31,7 +36,7 @@ const Login = (props) => {
       return
     }
   
-    if (password.length < 5) {
+    if (password.length < 6) {
       setPasswordError('The password must be 6 characters or longer')
       return
     }
@@ -41,22 +46,27 @@ const Login = (props) => {
 
   // Log in a user using email and password
   const logIn = () => {
-    API.login(email, password)
+    setSubmitting(true)
+    API.login(email.trim(), password)
     .then((response) => {
-      if (response.status === 200) {
-        localStorage.setItem('user', JSON.stringify({ email, token: response.data.token }))
-        setLoggedIn(true)
-        setEmail(email)
-        props.history.push('/Home')
-      } else {
-        window.alert('Wrong email or password')
-      }
+      localStorage.setItem('user', JSON.stringify({
+        email: email.trim(),
+        token: response.data.token
+      }))
+      window.dispatchEvent(new Event('auth-changed'))
+      if (props.history?.replace) props.history.replace('/home')
+      else navigate('/home', { replace: true })
     })
+    .catch((error) => {
+      const message = error.response?.data?.message || 'Wrong email or password'
+      setFormError(message)
+    })
+    .finally(() => setSubmitting(false))
   }
 
   return (
     <div className={"box"}>
-      <form className={"login-form"}>
+      <form className={"login-form"} onSubmit={onButtonClick}>
         <h1>Login</h1>
         <input
             type="text"
@@ -73,7 +83,8 @@ const Login = (props) => {
             onChange={(ev) => setPassword(ev.target.value)}
           />
           <label className="errorLabel">{passwordError}</label>
-        <input className={'inputButton'} type="submit" onClick={onButtonClick} value={'Log in'} />
+        <label className="errorLabel">{formError}</label>
+        <input className={'inputButton'} type="submit" disabled={submitting} value={submitting ? 'Signing in...' : 'Log in'} />
       </form>
     </div>
     
