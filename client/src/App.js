@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Link, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login/Login";
 import Home from "./pages/Home";
@@ -18,9 +18,10 @@ const hasValidSession = () => {
   }
 };
 
-const ProtectedRoute = ({ authenticated, children }) => (
-  authenticated ? children : <Navigate to="/" replace />
-);
+const ProtectedRoute = ({ authenticated, children }) => {
+  const location = useLocation();
+  return authenticated ? children : <Navigate to={`/?notice=auth&from=${encodeURIComponent(location.pathname)}`} replace />;
+};
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(hasValidSession);
@@ -28,7 +29,8 @@ const App = () => {
   useEffect(() => {
     const handleAuthChange = () => setLoggedIn(hasValidSession());
     window.addEventListener("auth-changed", handleAuthChange);
-    return () => window.removeEventListener("auth-changed", handleAuthChange);
+    window.addEventListener("auth-expired", handleAuthChange);
+    return () => { window.removeEventListener("auth-changed", handleAuthChange); window.removeEventListener("auth-expired", handleAuthChange); };
   }, []);
 
   const handleLogout = () => {
@@ -40,10 +42,10 @@ const App = () => {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div id="application">
-        <header>
-          <h1>NTD Challenge - Arithmetic Calculator REST API</h1>
+        <header className="app-header">
+          <Link className="brand" to={loggedIn ? "/home" : "/"}><span className="brand-mark">∑</span><span>Ledger / Calculate</span></Link>
           {loggedIn && <nav className="app-nav"><Link to="/home">Calculadora</Link><Link to="/records">Histórico</Link></nav>}
-          {loggedIn && <div className="btn-logout"><button className="inputButton" type="button" onClick={handleLogout}>Log out</button></div>}
+          {loggedIn && <div className="btn-logout"><button className="inputButton" type="button" onClick={handleLogout}>Sign out</button></div>}
         </header>
         <Routes>
           <Route path="/" element={<Login />} />
@@ -51,13 +53,7 @@ const App = () => {
           <Route path="/records" element={<ProtectedRoute authenticated={loggedIn}><Records /></ProtectedRoute>} />
           <Route path="*" element={<NoMatch />} />
         </Routes>
-        <footer>
-          <h3>Developed by: André Buzzo</h3>
-          <h4>
-            <a href="https://www.linkedin.com/in/andr%C3%A9-buzzo-140b5617/" target="_blank" rel="noreferrer"><i className="fa-brands fa-linkedin"></i></a>
-            <a href="https://github.com/andrelbuzzo/ntd-challenge-web-calculator" target="_blank" rel="noreferrer"><i className="fa-brands fa-github"></i></a>
-          </h4>
-        </footer>
+        <footer><span>Ledger / Calculate</span><span>Focused arithmetic, recorded clearly.</span></footer>
       </div>
     </Router>
   );

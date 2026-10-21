@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +23,16 @@ public class RecordService {
 
     public Page<RecordResponse> filter(String search, String operationType, User user, Pageable paging) {
         Page<Record> records;
-        if (search != null && !search.isBlank()) {
+        List<String> types = operationType == null ? List.of() : Arrays.stream(operationType.split(","))
+                .map(String::trim).filter(type -> !type.isBlank()).toList();
+        if (search != null && !search.isBlank() && !types.isEmpty()) {
+            records = recordRepository.searchByUserAndOperationTypes(user, search.trim(), types, paging);
+        } else if (search != null && !search.isBlank()) {
             records = recordRepository.searchByUser(user, search.trim(), paging);
-        } else if (operationType != null && !operationType.isBlank()) {
-            records = recordRepository.findAllByOperationTypeAndUserAndDeletedFalse(
-                    operationType, user, paging);
+        } else if (!types.isEmpty()) {
+            records = types.size() == 1
+                    ? recordRepository.findAllByOperationTypeAndUserAndDeletedFalse(types.get(0), user, paging)
+                    : recordRepository.findAllByOperationTypeInAndUserAndDeletedFalse(types, user, paging);
         } else {
             records = recordRepository.findAllByUserAndDeletedFalse(user, paging);
         }

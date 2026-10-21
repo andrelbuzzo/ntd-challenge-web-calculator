@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Button, Col, Row, Spinner } from "react-bootstrap";
+import { Alert, Spinner } from "react-bootstrap";
 import API from "../../utils/API";
 import "./Calculator.css";
 
@@ -66,14 +66,14 @@ const Calculator = ({ user, onUserChange }) => {
   };
 
   return (
-    <div className="calculator-card">
+    <section className="calculator-card" aria-labelledby="calcTitle">
       <div className="calculator-topline"><div><p className="eyebrow">CALCULADORA</p><h1 id="calcTitle">Faça seu cálculo</h1></div><div className="balance-chip"><span>Saldo</span><strong>{Number(user.balance || 0).toFixed(2)}</strong></div></div>
-      <div className="calculator-display"><span className="expression">{left || "0"} {operator} {right}</span><strong>{result || currentValue || "0"}</strong></div>
-      {error && <Alert variant="danger" className="calculator-alert">{error}</Alert>}
-      {message && !error && <Alert variant="success" className="calculator-alert">{message}</Alert>}
-      <div className="calculator-actions"><Button variant="outline-dark" onClick={squareRoot} disabled={loading}>√ Raiz</Button><Button variant="outline-dark" onClick={generateString} disabled={loading}>Gerar string</Button><Button variant="outline-danger" onClick={reset} disabled={loading}>Limpar</Button></div>
-      <Row className="keypad">{keys.map((key) => <Col xs={3} key={key}><Button className="key" variant={["+", "-", "*", "/", "±"].includes(key) ? "light" : "outline-light"} onClick={() => handleKey(key)}>{key}</Button></Col>)}<Col xs={12}><Button className="equals-key" variant="dark" onClick={() => execute()} disabled={loading}>{loading ? <Spinner size="sm" animation="border" /> : "="}</Button></Col></Row>
-    </div>
+      <div className="calculator-display" aria-live="polite"><span className="expression">{left || "0"} {operator} {right}</span><strong>{result || currentValue || "0"}</strong></div>
+      {error && <Alert variant="danger" className="calculator-alert" role="alert">{error}</Alert>}
+      {message && !error && <Alert variant="success" className="calculator-alert" role="status">{message}</Alert>}
+      <div className="calculator-actions"><button type="button" onClick={squareRoot} disabled={loading} aria-label="Calculate square root">√</button><button type="button" onClick={generateString} disabled={loading}>Random string</button><button type="button" className="utility" onClick={reset} disabled={loading}>Clear</button></div>
+      <div className="keypad">{keys.map((key) => <button type="button" className={`key ${["+", "-", "*", "/"].includes(key) ? "operator-key" : ""}`} aria-label={key === "*" ? "multiply" : key === "/" ? "divide" : key === "±" ? "toggle sign" : key} key={key} onClick={() => handleKey(key)} disabled={loading}>{key}</button>)}<button type="button" className="equals-key" onClick={() => execute()} disabled={loading} aria-label="=">{loading ? <Spinner size="sm" animation="border" /> : "="}</button></div>
+    </section>
   );
 };
 

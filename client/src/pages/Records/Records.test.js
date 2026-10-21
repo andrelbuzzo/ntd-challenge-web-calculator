@@ -67,4 +67,12 @@ describe("Records", () => {
     renderRecords();
     expect(await screen.findByText("Histórico indisponível")).toBeInTheDocument();
   });
+
+  it("sends multiple selected operation types to the API", async () => {
+    renderRecords();
+    await screen.findByText("ADDITION");
+    fireEvent.click(screen.getByLabelText("Addition"));
+    fireEvent.click(screen.getByLabelText("Division"));
+    await waitFor(() => expect(API.records).toHaveBeenLastCalledWith({ page: 0, search: "", sort: "createdAt,desc", operationTypes: ["ADDITION", "DIVISION"] }));
+  });
 });
