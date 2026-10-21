@@ -41,3 +41,4 @@ client/build/
 !**/.env.example
 *.mv.db
 *.trace.db
+*.pdf
