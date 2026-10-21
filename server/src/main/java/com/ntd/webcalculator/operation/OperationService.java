@@ -1,6 +1,7 @@
 package com.ntd.webcalculator.operation;
 
 import com.ntd.webcalculator.enums.OperationType;
+import com.ntd.webcalculator.exception.InvalidOperationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,8 +13,15 @@ public class OperationService {
             case "-" -> OperationType.SUBTRACTION;
             case "*" -> OperationType.MULTIPLICATION;
             case "/" -> OperationType.DIVISION;
-            case "^" -> OperationType.SQUARE_ROOT;
-            default -> OperationType.RANDOM_STRING;
+            case "sqrt", "^" -> OperationType.SQUARE_ROOT;
+            case "stringGen", "random_string" -> OperationType.RANDOM_STRING;
+            default -> {
+                try {
+                    yield OperationType.valueOf(operation.toUpperCase());
+                } catch (IllegalArgumentException exception) {
+                    throw new InvalidOperationException("Unsupported operation: " + operation);
+                }
+            }
         };
     }
 

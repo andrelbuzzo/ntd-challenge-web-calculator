@@ -36,28 +36,26 @@ public class Record implements Serializable {
     @ManyToOne
     private User user;
 
-//	private BigDecimal amount;
+    private BigDecimal amount;
 
     private BigDecimal userBalance;
 
     private String operationResponse;
 
-    boolean deleted;
+    private boolean deleted;
 
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public Record(String operationType, BigDecimal cost, User user, BigDecimal userBalance, String operationResponse) {
+    public Record(String operationType, BigDecimal cost, User user, BigDecimal amount,
+                  BigDecimal userBalance, String operationResponse) {
         this.operationType = operationType;
         this.cost = cost;
         this.user = user;
+        this.amount = amount;
         this.userBalance = userBalance;
         this.operationResponse = operationResponse;
     }
 
-    // String, BigDecimal, User, BigDecimal, String, LocalDateTime
-
-//	public Record(String name, BigDecimal cost, User user, BigDecimal credits, String string) {
-//	}
 }

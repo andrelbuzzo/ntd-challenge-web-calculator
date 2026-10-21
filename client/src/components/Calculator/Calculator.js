@@ -1,173 +1,80 @@
-import React, { Component } from "react";
-import { Col, Row } from "react-bootstrap";
-
-import CalcDisplay from "../CalcDisplay";
-import CalcButtonGroup from "../CalcButtonGroup";
-
+import React, { useState } from "react";
+import { Alert, Button, Col, Row, Spinner } from "react-bootstrap";
 import API from "../../utils/API";
-
 import "./Calculator.css";
 
-export default class Calculator extends Component {
-  constructor(props) {
-    super(props);
+const keys = ["7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", ".", "±", "+"];
 
-    this.state = {
-      input: "",
-      results: "",
-      operator: "",
-      param1: "",
-      param2: "",
-      APIFunction: null,
-      onParam1: true,
-      error: false,
-      loggedIn: localStorage.getItem('user') ? true : false
-    };
+const Calculator = ({ user, onUserChange }) => {
+  const [left, setLeft] = useState("");
+  const [right, setRight] = useState("");
+  const [operator, setOperator] = useState("");
+  const [result, setResult] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    this.resetValues = this.resetValues.bind(this);
-    this.getAPIFunction = this.getAPIFunction.bind(this);
-    this.performCalculation = this.performCalculation.bind(this);
-    this.handleOnClick = this.handleOnClick.bind(this);
-    
-    this.checkIfLoggedIn(props)
-  }
+  const currentValue = operator ? right : left;
 
-  checkIfLoggedIn(props) {
-    if (!this.state.loggedIn)
-      props.history.push('/')
-  }
+  const reset = () => { setLeft(""); setRight(""); setOperator(""); setResult(""); setMessage(""); setError(""); };
 
-  resetValues(error) {
-    this.setState({ 
-      input: "",
-      results: error ? "Error Occurred - Please Clear!" : "",
-      operator: "",
-      param1: "",
-      param2: "",
-      APIFunction: null,
-      onParam1: true,
-      error: error ? true : false
-    });  
-  }
+  const appendValue = (value) => {
+    const setter = operator ? setRight : setLeft;
+    const current = operator ? right : left;
+    if (value === "." && current.includes(".")) return;
+    setter(`${current}${value}`);
+    setError("");
+  };
 
-  getAPIFunction(value) {
-    console.log("getAPIFunction")
-    console.log(value);
-    let APIFunction = null;
+  const toggleSign = () => {
+    const setter = operator ? setRight : setLeft;
+    const current = operator ? right : left;
+    if (!current) return;
+    setter(current.startsWith("-") ? current.slice(1) : `-${current}`);
+  };
 
-    this.setState({ operator: value });
-    
-    APIFunction = API.calculate;
+  const execute = (selectedOperator = operator, selectedRight = right) => {
+    if (!left || !selectedOperator || !selectedRight) { setError("Informe os dois números antes de calcular."); return; }
+    setLoading(true); setError("");
+    API.calculate(selectedOperator, left, selectedRight)
+      .then(({ data }) => { setResult(data.result); setMessage(data.message); onUserChange({ ...user, balance: data.userBalance }); setLeft(String(data.result)); setRight(""); setOperator(""); })
+      .catch((requestError) => setError(requestError.response?.data?.message || "Não foi possível executar a operação."))
+      .finally(() => setLoading(false));
+  };
 
-    return APIFunction;
-  }
+  const squareRoot = () => {
+    if (!left) { setError("Informe um número para calcular a raiz."); return; }
+    setLoading(true); setError("");
+    API.calculate("sqrt", left, "0")
+      .then(({ data }) => { setResult(data.result); setMessage(data.message); onUserChange({ ...user, balance: data.userBalance }); setLeft(String(data.result)); })
+      .catch((requestError) => setError(requestError.response?.data?.message || "Não foi possível calcular a raiz."))
+      .finally(() => setLoading(false));
+  };
 
-  performCalculation(usedEqualSign, value) {
-    API.calculate(this.state.operator, this.state.param1, this.state.param2, JSON.parse(localStorage.getItem('user')).token)
-    .then(response => {
-      console.log("response")
-      console.log(response)
-      this.setState({
-        input: usedEqualSign ? this.state.input : this.state.input + " " + value + " ",
-        results: response.data.result,
-        param1: usedEqualSign ? "" : response.data.result,
-        operator: "",
-        param2: "",
-        APIFunction: usedEqualSign ? null : this.getAPIFunction(value),
-        onParam1: usedEqualSign ? true : false,
-        error: false
-      })
-    })
-    .catch(err => {
-      console.log(err);
-      this.resetValues(true);
-    })
-  }
+  const generateString = () => {
+    setLoading(true); setError("");
+    API.generateString()
+      .then(({ data }) => { setResult(data.message); setMessage("String gerada com sucesso"); onUserChange({ ...user, balance: data.userBalance }); })
+      .catch((requestError) => setError(requestError.response?.data?.message || "Não foi possível gerar a string."))
+      .finally(() => setLoading(false));
+  };
 
-  handleOnClick(event) {
-    console.log("handleOnClick")
-    const value = event.target.value;
-    console.log(value)
+  const handleKey = (key) => {
+    if (["+", "-", "*", "/"].includes(key)) { if (!left) return; setOperator(key); setError(""); return; }
+    if (key === "±") return toggleSign();
+    appendValue(key);
+  };
 
-    switch (value) {
-      case '=': {
-        console.log("case =")
-        console.log("operator: " + this.state.operator)
-        if (this.state.param1 === "" || 
-            this.state.param2 === "" || 
-            this.state.operator === "") {
-          this.resetValues(true);
-        } else {
-          console.log("performCalculation before")
-          this.performCalculation(true, null);
-        }
-        break;
-      }
-      case "Clear": {
-        this.resetValues(false);
-        break;
-      }
-      case "+":
-      case "-":
-      case "*":
-      case "/": {
-        if (this.state.param1 === "") {
-          this.resetValues(true);
-        }
-        else if (!this.state.onParam1) {
-          console.log("----")
-          this.performCalculation(false, value);
-        }
-        else {
-          this.setState({
-            input: this.state.input + " " + value + " ",
-            //APIFunction: this.getAPIFunction(value),
-            operator: value,
-            onParam1: false
-          })
-          console.log("setou operator: " + this.state.operator)
-        }
-        break;
-      }
-      default: {
-        console.log("handleOnClick - default")
-        this.setState({
-          input: this.state.input + value,
-          param1: 
-            this.state.onParam1 ? this.state.param1 + value : this.state.param1,
-          param2:
-            this.state.onParam1 ? this.state.param2 : this.state.param2 + value
-        })
-      }
-    }
-  }
+  return (
+    <div className="calculator-card">
+      <div className="calculator-topline"><div><p className="eyebrow">CALCULADORA</p><h1 id="calcTitle">Faça seu cálculo</h1></div><div className="balance-chip"><span>Saldo</span><strong>{Number(user.balance || 0).toFixed(2)}</strong></div></div>
+      <div className="calculator-display"><span className="expression">{left || "0"} {operator} {right}</span><strong>{result || currentValue || "0"}</strong></div>
+      {error && <Alert variant="danger" className="calculator-alert">{error}</Alert>}
+      {message && !error && <Alert variant="success" className="calculator-alert">{message}</Alert>}
+      <div className="calculator-actions"><Button variant="outline-dark" onClick={squareRoot} disabled={loading}>√ Raiz</Button><Button variant="outline-dark" onClick={generateString} disabled={loading}>Gerar string</Button><Button variant="outline-danger" onClick={reset} disabled={loading}>Limpar</Button></div>
+      <Row className="keypad">{keys.map((key) => <Col xs={3} key={key}><Button className="key" variant={["+", "-", "*", "/", "±"].includes(key) ? "light" : "outline-light"} onClick={() => handleKey(key)}>{key}</Button></Col>)}<Col xs={12}><Button className="equals-key" variant="dark" onClick={() => execute()} disabled={loading}>{loading ? <Spinner size="sm" animation="border" /> : "="}</Button></Col></Row>
+    </div>
+  );
+};
 
-  render() {
-    return (
-      <div>
-        <Row className="show-grid">
-          <Col>
-            <h1 id="calcTitle">Simple Calculator</h1>
-          </Col>
-        </Row>
-        <Row className="show-grid">
-          <Col xs={12} md={12}>
-            <CalcDisplay value={this.state.input} />
-            <CalcDisplay className="result"
-              value={this.state.results}
-              error={this.state.error}
-            />
-          </Col>
-        </Row>
-        <Row className="show-grid mt-10 mb-10">
-          <Col xs={12} md={12}>
-            <CalcButtonGroup
-              handleOnClick={this.handleOnClick}
-            />
-          </Col>
-        </Row>
-
-      </div>
-    );
-  }
-}
+export default Calculator;
