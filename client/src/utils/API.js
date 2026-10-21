@@ -1,21 +1,37 @@
 import axios from "axios";
 
-export default {
-  login: (username, password) => 
-    axios.post(`/api/v1/users/login`, {
-      username: username,
-      password: password
-    }),
-  add: (param1, param2) => 
-    axios.get(`/api/v1/calculator/add?param1=${param1}&param2=${param2}`),
-  subtract: (param1, param2) => 
-    axios.get(`/api/v1/calculator/subtract?param1=${param1}&param2=${param2}`),
-  multiply: (param1, param2) => 
-    axios.get(`/api/v1/calculator/multiply?param1=${param1}&param2=${param2}`),
-  divide: (param1, param2) => 
-    axios.get(`/api/v1/calculator/divide?param1=${param1}&param2=${param2}`),
-  calculate: (operator, leftOperand, rightOperand, token) => 
-    axios.get(`/api/v1/calculator?operator=${encodeURIComponent(operator)}&leftOperand=${leftOperand}&rightOperand=${rightOperand}`, {
-      headers: {'Authorization': 'Bearer ' + token}
-    })
+const getStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
 };
+
+const api = axios.create({
+  baseURL: "/api/v1"
+});
+
+api.interceptors.request.use((config) => {
+  const user = getStoredUser();
+  if (user?.token) {
+    config.headers.Authorization = `Bearer ${user.token}`;
+  }
+  return config;
+});
+
+const API = {
+  login: (username, password) => api.post("/users/login", { username, password }),
+  currentUser: () => api.get("/users/me"),
+  calculate: (operator, leftOperand, rightOperand) => api.get("/calculator", {
+    params: { operator, leftOperand, rightOperand }
+  }),
+  generateString: () => api.get("/generate-string"),
+  records: ({ page = 0, size = 10, search = "", operationType = "", sort = "createdAt,desc" } = {}) => api.get("/records", {
+    params: { page, size, search: search || undefined, operationType: operationType || undefined, sort }
+  }),
+  deleteRecord: (id) => api.delete("/records", { params: { id } })
+};
+
+export default API;

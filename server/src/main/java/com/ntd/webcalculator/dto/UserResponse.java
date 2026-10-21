@@ -13,7 +13,7 @@ public class UserResponse {
 
 	private String username;
 
-	private String Role;
+	private String role;
 
 	private BigDecimal balance;
 
