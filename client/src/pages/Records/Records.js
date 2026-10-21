@@ -11,20 +11,26 @@ const Records = () => {
   const [data, setData] = useState({ content: [], page: 0, size: 10, totalPages: 0, totalElements: 0 });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("createdAt,desc");
+  const [operationTypes, setOperationTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const loadRecords = useCallback((page = 0) => {
     setLoading(true);
     setError("");
-    API.records({ page, search, sort })
+    API.records({ page, search, sort, ...(operationTypes.length ? { operationTypes } : {}) })
       .then(({ data: response }) => setData(response))
       .catch((requestError) => {
-        if (requestError.response?.status === 401) navigate("/", { replace: true });
+        if (requestError.response?.status === 401) {
+          localStorage.removeItem("user");
+          window.dispatchEvent(new Event("auth-expired"));
+          navigate("/?notice=auth&from=%2Frecords", { replace: true });
+          return;
+        }
         setError(requestError.response?.data?.message || "Não foi possível carregar o histórico.");
       })
       .finally(() => setLoading(false));
-  }, [navigate, search, sort]);
+  }, [navigate, search, sort, operationTypes]);
 
   useEffect(() => { loadRecords(0); }, [loadRecords]);
 
@@ -48,6 +54,7 @@ const Records = () => {
           <option value="createdAt,desc">Mais recentes</option><option value="createdAt,asc">Mais antigos</option><option value="cost,desc">Maior custo</option><option value="cost,asc">Menor custo</option>
         </Form.Control>
       </div>
+      <fieldset className="operation-filters"><legend>Filtrar operações</legend>{[["ADDITION","Adição"],["SUBTRACTION","Subtração"],["MULTIPLICATION","Multiplicação"],["DIVISION","Divisão"],["SQUARE_ROOT","Raiz quadrada"],["RANDOM_STRING","String aleatória"]].map(([value, label]) => <label key={value}><input type="checkbox" checked={operationTypes.includes(value)} onChange={() => setOperationTypes((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value])} /> {label}</label>)}</fieldset>
       {error && <Alert variant="danger">{error}</Alert>}
       <div className="table-wrap">
         {loading ? <div className="loading-state"><Spinner animation="border" size="sm" /> Carregando...</div> : data.content.length === 0 ? <div className="empty-state"><strong>Nenhuma operação encontrada</strong><span>Seus próximos cálculos aparecerão aqui.</span></div> : (

@@ -1,3 +1,1 @@
-#noMatchError {
-  color: #EE5B4F!important;
-}
+.not-found { margin: 0 auto; max-width: 680px; padding: 100px 24px; }.not-found h1 { font-size: clamp(2.4rem, 7vw, 5rem); letter-spacing: -.06em; margin: 8px 0; }.not-found a { color: #b85c3b; }

@@ -1,10 +1,13 @@
 import "./Login.css";
 import React, { useState } from 'react'
 import API from "../../utils/API";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Login = (props) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const destination = params.get("from") || "/home";
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -54,8 +57,8 @@ const Login = (props) => {
         token: response.data.token
       }))
       window.dispatchEvent(new Event('auth-changed'))
-      if (props.history?.replace) props.history.replace('/home')
-      else navigate('/home', { replace: true })
+       if (props.history?.replace) props.history.replace(destination)
+       else navigate(destination, { replace: true })
     })
     .catch((error) => {
       const message = error.response?.data?.message || 'Wrong email or password'
@@ -65,18 +68,22 @@ const Login = (props) => {
   }
 
   return (
-    <div className={"box"}>
+    <main className="login-page"><div className={"box"}>
+      {params.get("notice") === "auth" && <div className="auth-notice" role="status">Você precisa entrar para acessar esse recurso.</div>}
       <form className={"login-form"} onSubmit={onButtonClick}>
-        <h1>Login</h1>
+        <p className="eyebrow">PRIVATE WORKSPACE</p><h1>Welcome back.</h1><p className="muted-copy">Sign in to run calculations and keep your activity in one place.</p>
+        <label htmlFor="email">Email</label>
         <input
+            id="email"
             type="text"
             value={email}
-            placeholder="Username (email)"
+            placeholder="you@example.com"
             onChange={(ev) => setEmail(ev.target.value)}
           />
           <label className="errorLabel">{emailError}</label>
 
-        <input
+        <label htmlFor="password">Password</label><input
+            id="password"
             type="password"
             value={password}
             placeholder="Password"
@@ -86,7 +93,7 @@ const Login = (props) => {
         <label className="errorLabel">{formError}</label>
         <input className={'inputButton'} type="submit" disabled={submitting} value={submitting ? 'Signing in...' : 'Log in'} />
       </form>
-    </div>
+    </div></main>
     
     /*<div className={'loginContainer'}>
       <div className={'mainContainer'}>

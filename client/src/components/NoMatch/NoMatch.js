@@ -1,11 +1,6 @@
 import React from "react";
-import { Alert } from "react-bootstrap";
 import "./NoMatch.css";
 
-const NoMatch = () => (
-  <Alert variant="light" className="text-center">
-    <h1 id="noMatchError">404 Page Not Found</h1>
-  </Alert>
-);
+const NoMatch = () => <main className="not-found"><p className="eyebrow">ERROR 404</p><h1 id="noMatchError">That page is missing.</h1><p className="muted-copy">The address may be out of date or the page may have moved.</p><a href="/home">Return to calculator</a></main>;
 
 export default NoMatch;

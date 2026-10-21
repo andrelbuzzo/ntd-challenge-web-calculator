@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
+import java.util.Collection;
 
 @Repository
 public interface RecordRepository extends JpaRepository<Record, UUID> {
@@ -21,6 +22,8 @@ public interface RecordRepository extends JpaRepository<Record, UUID> {
 
     Page<Record> findAllByOperationTypeAndUserAndDeletedFalse(String operationType, User user, Pageable pageable);
 
+    Page<Record> findAllByOperationTypeInAndUserAndDeletedFalse(Collection<String> operationTypes, User user, Pageable pageable);
+
     @Query("""
             select record from Record record
             where record.user = :user and record.deleted = false
@@ -28,6 +31,18 @@ public interface RecordRepository extends JpaRepository<Record, UUID> {
                    or lower(record.operationResponse) like lower(concat('%', :search, '%')))
             """)
     Page<Record> searchByUser(@Param("user") User user, @Param("search") String search, Pageable pageable);
+
+    @Query("""
+            select record from Record record
+            where record.user = :user and record.deleted = false
+              and record.operationType in :operationTypes
+              and (lower(record.operationType) like lower(concat('%', :search, '%'))
+                   or lower(record.operationResponse) like lower(concat('%', :search, '%')))
+            """)
+    Page<Record> searchByUserAndOperationTypes(@Param("user") User user,
+                                                @Param("search") String search,
+                                                @Param("operationTypes") Collection<String> operationTypes,
+                                                Pageable pageable);
 
     java.util.Optional<Record> findByIdAndUser(UUID id, User user);
 

@@ -31,7 +31,7 @@ describe("Login", () => {
     API.login.mockResolvedValue({ data: { token: "test-token" } });
     render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Login history={history} /></MemoryRouter>);
 
-    fireEvent.change(screen.getByPlaceholderText("Username (email)"), {
+    fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
       target: { value: " user1@ntd.com " }
     });
     fireEvent.change(screen.getByPlaceholderText("Password"), {
@@ -51,7 +51,7 @@ describe("Login", () => {
     API.login.mockRejectedValue({ response: { data: { message: "Invalid credentials" } } });
     render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Login history={history} /></MemoryRouter>);
 
-    fireEvent.change(screen.getByPlaceholderText("Username (email)"), {
+    fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
       target: { value: "user1@ntd.com" }
     });
     fireEvent.change(screen.getByPlaceholderText("Password"), {

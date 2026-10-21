@@ -1,50 +1,8 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.mb-0 {
-  margin-bottom: 0;
-}
-
-.mt-10 {
-  margin-top: 10px;
-}
-
-.mb-10 {
-  margin-bottom: 10px;
-}
-
-#application > header { align-items: center; background: #292622; color: #fff; display: flex; gap: 28px; padding: 16px max(24px, calc((100vw - 1180px) / 2)); }
-#application > header h1 { flex: 1; font-size: .9rem; font-weight: 600; letter-spacing: .03em; margin: 0; }
-.app-nav { display: flex; gap: 18px; } .app-nav a { color: #d8d0c7; font-size: .85rem; } .app-nav a:hover { color: #fff; text-decoration: none; }
-.btn-logout { margin: 0; } .btn-logout .inputButton { background: transparent; border: 1px solid #766e65; border-radius: 6px; color: #fff; padding: 5px 10px; }
-@media (max-width: 680px) { #application > header { flex-wrap: wrap; } #application > header h1 { flex-basis: 100%; } .app-nav { order: 3; } }
+#application { min-height: 100vh; display: flex; flex-direction: column; }
+.app-header { align-items: center; border-bottom: 1px solid #ded8d0; display: flex; gap: 28px; padding: 18px max(24px, calc((100vw - 1180px) / 2)); }
+.brand { align-items: center; color: #292622; display: flex; flex: 1; font-size: .9rem; font-weight: 700; gap: 9px; letter-spacing: .02em; text-decoration: none; }
+.brand-mark { align-items: center; background: #b85c3b; color: white; display: inline-flex; font-size: 1.1rem; height: 28px; justify-content: center; width: 28px; }
+.app-nav { display: flex; gap: 20px; }.app-nav a { color: #6f685f; font-size: .88rem; text-decoration: none; }.app-nav a.active,.app-nav a:hover { color: #b85c3b; }
+.btn-logout button { background: transparent; border: 1px solid #c9c1b8; color: #4c4741; cursor: pointer; padding: 7px 12px; }
+footer { color: #8a8278; display: flex; font-size: .76rem; justify-content: space-between; margin: auto auto 0; max-width: 1180px; padding: 28px 24px; width: calc(100% - 48px); }
+@media (max-width:680px) { .app-header { flex-wrap: wrap; gap: 14px; }.brand { flex-basis: 70%; }.app-nav { order: 3; width: 100%; } footer { flex-direction: column; gap: 5px; } }

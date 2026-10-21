@@ -21,6 +21,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+if (api.interceptors.response) {
+  api.interceptors.response.use((response) => response, (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("user");
+      window.dispatchEvent(new Event("auth-expired"));
+    }
+    return Promise.reject(error);
+  });
+}
+
 const API = {
   login: (username, password) => api.post("/users/login", { username, password }),
   currentUser: () => api.get("/users/me"),
@@ -28,8 +38,8 @@ const API = {
     params: { operator, leftOperand, rightOperand }
   }),
   generateString: () => api.get("/generate-string"),
-  records: ({ page = 0, size = 10, search = "", operationType = "", sort = "createdAt,desc" } = {}) => api.get("/records", {
-    params: { page, size, search: search || undefined, operationType: operationType || undefined, sort }
+  records: ({ page = 0, size = 10, search = "", operationTypes = [], operationType = "", sort = "createdAt,desc" } = {}) => api.get("/records", {
+    params: { page, size, search: search || undefined, operationType: operationTypes.length ? operationTypes.join(",") : (operationType || undefined), sort }
   }),
   deleteRecord: (id) => api.delete("/records", { params: { id } })
 };
