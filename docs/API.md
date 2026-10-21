@@ -58,3 +58,33 @@ The endpoint is authenticated and delegates string generation to Random.org.
 
 Records belong to the authenticated user. Search, sorting, pagination metadata,
 and soft deletion are part of the completion plan.
+
+Supported query parameters:
+
+- `search`: partial match against operation type or operation response.
+- `operationType`: exact operation type filter.
+- `page`: zero-based page number.
+- `size`: page size, capped at 50.
+- `sort`: `createdAt`, `cost`, `userBalance`, or `operationType`, followed by
+  `asc` or `desc`.
+
+`DELETE /api/v1/records?id=<uuid>` performs a soft delete. The record remains
+in the database but is omitted from normal queries.
+
+## Current user
+
+`GET /api/v1/users/me`
+
+Returns the authenticated user and current balance.
+
+## Error format
+
+```json
+{
+  "timestamp": "2026-01-01T12:00:00Z",
+  "status": 422,
+  "error": "Unprocessable Entity",
+  "message": "Insufficient balance",
+  "path": "/api/v1/calculator"
+}
+```

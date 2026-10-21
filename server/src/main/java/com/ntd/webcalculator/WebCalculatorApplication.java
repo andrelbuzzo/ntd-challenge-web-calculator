@@ -1,7 +1,6 @@
 package com.ntd.webcalculator;
 
 import com.ntd.webcalculator.enums.Role;
-import com.ntd.webcalculator.enums.Status;
 import com.ntd.webcalculator.user.User;
 import com.ntd.webcalculator.user.UserService;
 import org.springframework.boot.CommandLineRunner;
@@ -18,15 +17,16 @@ public class WebCalculatorApplication {
 
     @Bean
     CommandLineRunner run(UserService userService) {
-        return args -> {  // inserting data after application is up
-            System.out.println("Running");
+        return args -> {
             String defaultPswd = "123456";
 
-            if (userService.findAllByRole(Role.ADMIN, null).isEmpty()) {
-
+            if (userService.findByUsername("admin@ntd.com").isEmpty()) {
                 userService.save(new User("Admin", "admin@ntd.com", defaultPswd, Role.ADMIN));
-                for (int i = 1; i <= 10; i++) {
-                    userService.save(new User("User " + i, "user" + i + "@ntd.com", defaultPswd, null));
+            }
+            for (int i = 1; i <= 10; i++) {
+                String username = "user" + i + "@ntd.com";
+                if (userService.findByUsername(username).isEmpty()) {
+                    userService.save(new User("User " + i, username, defaultPswd, null));
                 }
             }
         };

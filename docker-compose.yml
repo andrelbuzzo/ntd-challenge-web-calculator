@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ntd
+      MYSQL_USER: ntd
+      MYSQL_PASSWORD: ntd
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--protocol=tcp", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./server
+    environment:
+      SERVER_PORT: 8090
+      DB_URL: jdbc:mysql://db:3306/ntd?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: ntd
+      DB_PASSWORD: ntd
+      DB_DRIVER: com.mysql.cj.jdbc.Driver
+      JPA_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET:-local-compose-secret-change-me}
+      CORS_ALLOWED_ORIGINS: http://localhost:3001
+    ports:
+      - "8090:8090"
+    restart: on-failure:5
+    depends_on:
+      db:
+        condition: service_healthy
+
+  client:
+    build: ./client
+    ports:
+      - "3001:80"
+    depends_on:
+      - api
+
+volumes:
+  mysql-data:

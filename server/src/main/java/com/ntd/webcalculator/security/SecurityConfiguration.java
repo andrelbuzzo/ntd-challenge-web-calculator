@@ -1,7 +1,6 @@
 package com.ntd.webcalculator.security;
 
 import lombok.RequiredArgsConstructor;
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +17,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -29,15 +35,17 @@ public class SecurityConfiguration {
 	private final UserDetailsService userService;
 	private final PasswordEncoder passwordEncoder;
 
+	@Value("${app.cors.allowed-origins:http://localhost:3001}")
+	private String allowedOrigins;
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
+				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Do not create session
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/", "/h2/**", "/swagger-ui/**", "/api-docs", "/api-docs/**").permitAll() // white list (swagger and root entry point)
-						.requestMatchers(toH2Console()).permitAll()
+						.requestMatchers("/", "/swagger-ui/**", "/api-docs", "/api-docs/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/v1/users/login").permitAll() // white list: login endpoint
-						.requestMatchers(HttpMethod.GET, "/api/v1/users").permitAll()  // white list: fetch users list
 						.anyRequest().authenticated()  // all others endpoints should be authenticated
 				)
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -45,6 +53,20 @@ public class SecurityConfiguration {
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
+	}
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+				.map(String::trim).filter(origin -> !origin.isEmpty()).toList());
+		configuration.setAllowedMethods(List.of("GET", "POST", "DELETE", "PATCH", "OPTIONS"));
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+		configuration.setAllowCredentials(false);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
 	}
 
 	@Bean

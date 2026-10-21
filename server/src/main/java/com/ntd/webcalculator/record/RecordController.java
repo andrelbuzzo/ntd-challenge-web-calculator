@@ -30,7 +30,7 @@ public class RecordController {
                                                          @RequestParam(defaultValue = "10") int size,
                                                          @RequestParam(defaultValue = "createdAt,desc") String sort) {
         User user = userService.loadUserByUsername(authentication.getName());
-        Pageable paging = PageRequest.of(page, Math.min(size, 50), sort(sort));
+        Pageable paging = PageRequest.of(Math.max(page, 0), Math.max(1, Math.min(size, 50)), sort(sort));
         return ResponseEntity.ok(RecordPageResponse.from(
                 recordService.filter(search, operationType, user, paging)));
     }

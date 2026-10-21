@@ -1,25 +1,45 @@
-# NTD Challenge — Arithmetic Calculator
+# NTD Arithmetic Calculator
 
-This repository contains the React client and Spring Boot API for the NTD
-arithmetic calculator challenge.
+Full-stack implementation of the NTD Software coding challenge. The project
+contains a React client and a Spring Boot REST API with JWT authentication,
+transactional balance debits, operation history, soft deletion, and Random.org
+integration.
 
-## Current status
+## Stack
 
-The first implementation milestone is authentication. The development login
-credentials are `admin@ntd.com` / `123456` and `user1@ntd.com` / `123456`.
+- Java 21
+- Spring Boot 3.4.10
+- Spring Security + JWT
+- Spring Data JPA
+- H2 for lightweight local development/tests
+- MySQL 8.4 in Docker Compose
+- React 18.3.1
+- React Bootstrap 1.6.8
+- Gradle 8.10.2
+- npm
 
-## Run locally
+## Requirements
 
-### API
+- JDK 21
+- Node.js 22 or later
+- npm
+- Docker Desktop, only when using Compose
+
+## Run locally without Docker
+
+### 1. Start the API
 
 ```powershell
 cd server
-./gradlew.bat bootRun
+.\gradlew.bat bootRun
 ```
 
-The API runs on `http://localhost:8090`.
+The API runs at `http://localhost:8090` and uses an H2 file database under
+`server/data` by default. The database is created/updated automatically.
 
-### Client
+### 2. Start the client
+
+In a second terminal:
 
 ```powershell
 cd client
@@ -27,13 +47,106 @@ npm install
 npm start
 ```
 
-The client runs on `http://localhost:3001` and proxies API calls to the local
-server. Port `3001` is intentional because port `3000` may be occupied by
-another local service in the development environment.
+The client runs at `http://localhost:3001`. The development port is 3001
+because another local service may use port 3000. API calls are proxied to port
+8090.
 
-## Documentation
+### 3. Test accounts
+
+The development seed creates these disposable accounts:
+
+| Username | Password | Initial balance |
+| --- | --- | ---: |
+| `admin@ntd.com` | `123456` | `10.00` |
+| `user1@ntd.com` | `123456` | `10.00` |
+| `user2@ntd.com` | `123456` | `10.00` |
+
+Do not reuse these credentials in a public deployment.
+
+## Run with Docker Compose
+
+From the repository root:
+
+```powershell
+docker compose up --build
+```
+
+The services are available at:
+
+- Client: `http://localhost:3001`
+- API: `http://localhost:8090`
+- MySQL: local Compose network only
+
+Set a deployment-grade JWT secret before starting Compose:
+
+```powershell
+$env:JWT_SECRET = "replace-with-a-long-random-secret"
+docker compose up --build
+```
+
+Stop services and remove the local database volume with:
+
+```powershell
+docker compose down -v
+```
+
+## API summary
+
+All endpoints except login require:
+
+```text
+Authorization: Bearer <jwt>
+```
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| POST | `/api/v1/users/login` | Authenticate and receive JWT |
+| GET | `/api/v1/users/me` | Read current user and balance |
+| GET | `/api/v1/calculator` | Execute arithmetic operation |
+| GET | `/api/v1/generate-string` | Generate a Random.org string |
+| GET | `/api/v1/records` | Search, sort, and paginate own records |
+| DELETE | `/api/v1/records?id=<uuid>` | Soft-delete own record |
+
+Full request/response details are in [docs/API.md](docs/API.md).
+
+## Configuration
+
+The API reads environment variables described in
+
+- `SERVER_PORT`
+- `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DRIVER`
+- `JPA_DDL_AUTO`
+- `JWT_SECRET`
+- `CORS_ALLOWED_ORIGINS`
+- `H2_CONSOLE_ENABLED`
+
+The JWT secret must be changed for any non-local environment. Secrets must not
+be committed to the repository.
+
+## Tests and builds
+
+Backend:
+
+```powershell
+cd server
+.\gradlew.bat test
+```
+
+Frontend:
+
+```powershell
+cd client
+npm test -- --watchAll=false
+npm run build
+```
+
+## Architecture and decisions
 
 - [Requirements](docs/REQUIREMENTS.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [API contract](docs/API.md)
 - [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
+
+The balance debit and record creation are performed in one transaction. User
+rows are pessimistically locked while the operation is executed, preventing
+concurrent requests from spending the same balance.

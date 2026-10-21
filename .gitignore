@@ -25,3 +25,19 @@ replay_pid*
 /server/.idea/
 /server/build/
 /server/.gradle/
+
+# IDEs and generated project metadata
+.idea/
+*.iml
+
+# Node dependencies and production output
+node_modules/
+client/build/
+
+# Local environment and database files
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.mv.db
+*.trace.db
