@@ -8,14 +8,14 @@ integration.
 ## Stack
 
 - Java 21
-- Spring Boot 3.4.10
+- Spring Boot 4.1.1
 - Spring Security + JWT
 - Spring Data JPA
 - H2 for lightweight local development/tests
 - MySQL 8.4 in Docker Compose
-- React 18.3.1
-- React Bootstrap 1.6.8
-- Gradle 8.10.2
+- React 19.3.1
+- React Bootstrap 2.10.10
+- Gradle 8.14.3
 - npm
 
 ## Requirements

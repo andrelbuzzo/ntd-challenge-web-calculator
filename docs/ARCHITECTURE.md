@@ -2,7 +2,7 @@
 
 The repository contains two independently runnable stacks:
 
-- `server/`: Spring Boot REST API, JWT authentication, JPA persistence, and
+- `server/`: Spring Boot 4 REST API, JWT authentication, JPA persistence, and
   service-layer business logic.
 - `client/`: React single-page application consuming only the versioned REST
   API.
