@@ -44,7 +44,7 @@ const App = () => {
       <div id="application">
         <header className="app-header">
           <Link className="brand" to={loggedIn ? "/home" : "/"}><span className="brand-mark">∑</span><span>Ledger / Calculate</span></Link>
-          {loggedIn && <nav className="app-nav"><Link to="/home">Calculadora</Link><Link to="/records">Histórico</Link></nav>}
+          {loggedIn && <nav className="app-nav"><Link to="/home">Calculator</Link><Link to="/records">History</Link></nav>}
           {loggedIn && <div className="btn-logout"><button className="inputButton" type="button" onClick={handleLogout}>Sign out</button></div>}
         </header>
         <Routes>

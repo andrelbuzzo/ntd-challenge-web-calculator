@@ -57,19 +57,35 @@ The endpoint is authenticated and delegates string generation to Random.org.
 `GET /api/v1/records?page=0&size=10&sort=createdAt,desc`
 
 Records belong to the authenticated user. Search, sorting, pagination metadata,
-and soft deletion are part of the completion plan.
+and soft deletion are part of the contract. Normal record queries exclude
+soft-deleted records.
 
 Supported query parameters:
 
 - `search`: partial match against operation type or operation response.
-- `operationType`: exact operation type filter.
+- `operationType`: one or more operation type filters. Values may be supplied as
+  a comma-separated list (`operationType=ADDITION,DIVISION`), repeated query
+  parameters (`operationType=ADDITION&operationType=DIVISION`), or both. Values
+  are case-insensitive, surrounding whitespace is ignored, and duplicate values
+  are collapsed. Supported values are `ADDITION`, `SUBTRACTION`,
+  `MULTIPLICATION`, `DIVISION`, `SQUARE_ROOT`, and `RANDOM_STRING`. Unsupported
+  values return `400 Bad Request`. Stored operation type values remain the
+  existing uppercase names.
 - `page`: zero-based page number.
 - `size`: page size, capped at 50.
 - `sort`: `createdAt`, `cost`, `userBalance`, or `operationType`, followed by
   `asc` or `desc`.
 
 `DELETE /api/v1/records?id=<uuid>` performs a soft delete. The record remains
-in the database but is omitted from normal queries.
+in the database but is omitted from normal queries. A record can only be
+deleted by its owner; an unknown or another user's record returns `404`.
+
+`PATCH /api/v1/records/undelete?id=<uuid>` restores an owned soft-deleted
+record. It is also ownership-scoped and returns `404` when the record is not
+owned by the authenticated user.
+
+Successful list responses contain `content` plus zero-based `page`, effective
+`size`, `totalElements`, `totalPages`, and `first`/`last` pagination metadata.
 
 ## Current user
 

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Log4j2
@@ -25,14 +26,14 @@ public class RecordController {
     @GetMapping()
     public ResponseEntity<RecordPageResponse> getRecords(Authentication authentication,
                                                          @RequestParam(required = false) String search,
-                                                         @RequestParam(required = false) String operationType,
+                                                         @RequestParam(name = "operationType", required = false) List<String> operationTypes,
                                                          @RequestParam(defaultValue = "0") int page,
                                                          @RequestParam(defaultValue = "10") int size,
                                                          @RequestParam(defaultValue = "createdAt,desc") String sort) {
         User user = userService.loadUserByUsername(authentication.getName());
         Pageable paging = PageRequest.of(Math.max(page, 0), Math.max(1, Math.min(size, 50)), sort(sort));
         return ResponseEntity.ok(RecordPageResponse.from(
-                recordService.filter(search, operationType, user, paging)));
+                recordService.filter(search, operationTypes, user, paging)));
     }
 
     @DeleteMapping()

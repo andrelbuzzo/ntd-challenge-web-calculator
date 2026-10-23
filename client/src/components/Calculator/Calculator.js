@@ -34,28 +34,28 @@ const Calculator = ({ user, onUserChange }) => {
   };
 
   const execute = (selectedOperator = operator, selectedRight = right) => {
-    if (!left || !selectedOperator || !selectedRight) { setError("Informe os dois números antes de calcular."); return; }
+    if (!left || !selectedOperator || !selectedRight) { setError("Enter both numbers before calculating."); return; }
     setLoading(true); setError("");
     API.calculate(selectedOperator, left, selectedRight)
       .then(({ data }) => { setResult(data.result); setMessage(data.message); onUserChange({ ...user, balance: data.userBalance }); setLeft(String(data.result)); setRight(""); setOperator(""); })
-      .catch((requestError) => setError(requestError.response?.data?.message || "Não foi possível executar a operação."))
+      .catch((requestError) => setError(requestError.response?.data?.message || "Unable to execute the operation."))
       .finally(() => setLoading(false));
   };
 
   const squareRoot = () => {
-    if (!left) { setError("Informe um número para calcular a raiz."); return; }
+    if (!left) { setError("Enter a number to calculate its square root."); return; }
     setLoading(true); setError("");
     API.calculate("sqrt", left, "0")
       .then(({ data }) => { setResult(data.result); setMessage(data.message); onUserChange({ ...user, balance: data.userBalance }); setLeft(String(data.result)); })
-      .catch((requestError) => setError(requestError.response?.data?.message || "Não foi possível calcular a raiz."))
+      .catch((requestError) => setError(requestError.response?.data?.message || "Unable to calculate the square root."))
       .finally(() => setLoading(false));
   };
 
   const generateString = () => {
     setLoading(true); setError("");
     API.generateString()
-      .then(({ data }) => { setResult(data.message); setMessage("String gerada com sucesso"); onUserChange({ ...user, balance: data.userBalance }); })
-      .catch((requestError) => setError(requestError.response?.data?.message || "Não foi possível gerar a string."))
+      .then(({ data }) => { setResult(data.message); setMessage("String generated successfully"); onUserChange({ ...user, balance: data.userBalance }); })
+      .catch((requestError) => setError(requestError.response?.data?.message || "Unable to generate the string."))
       .finally(() => setLoading(false));
   };
 
@@ -67,7 +67,7 @@ const Calculator = ({ user, onUserChange }) => {
 
   return (
     <section className="calculator-card" aria-labelledby="calcTitle">
-      <div className="calculator-topline"><div><p className="eyebrow">CALCULADORA</p><h1 id="calcTitle">Faça seu cálculo</h1></div><div className="balance-chip"><span>Saldo</span><strong>{Number(user.balance || 0).toFixed(2)}</strong></div></div>
+      <div className="calculator-topline"><div><p className="eyebrow">CALCULATOR</p><h1 id="calcTitle">Run a calculation</h1></div><div className="balance-chip"><span>Balance</span><strong>{Number(user.balance || 0).toFixed(2)}</strong></div></div>
       <div className="calculator-display" aria-live="polite"><span className="expression">{left || "0"} {operator} {right}</span><strong>{result || currentValue || "0"}</strong></div>
       {error && <Alert variant="danger" className="calculator-alert" role="alert">{error}</Alert>}
       {message && !error && <Alert variant="success" className="calculator-alert" role="status">{message}</Alert>}

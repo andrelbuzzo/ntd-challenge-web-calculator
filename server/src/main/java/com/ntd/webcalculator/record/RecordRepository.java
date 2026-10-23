@@ -22,7 +22,15 @@ public interface RecordRepository extends JpaRepository<Record, UUID> {
 
     Page<Record> findAllByOperationTypeAndUserAndDeletedFalse(String operationType, User user, Pageable pageable);
 
-    Page<Record> findAllByOperationTypeInAndUserAndDeletedFalse(Collection<String> operationTypes, User user, Pageable pageable);
+    @Query("""
+            select record from Record record
+            where record.user = :user and record.deleted = false
+              and lower(record.operationType) in :operationTypes
+            """)
+    Page<Record> findAllByOperationTypeInAndUserAndDeletedFalse(
+            @Param("operationTypes") Collection<String> operationTypes,
+            @Param("user") User user,
+            Pageable pageable);
 
     @Query("""
             select record from Record record
@@ -35,7 +43,7 @@ public interface RecordRepository extends JpaRepository<Record, UUID> {
     @Query("""
             select record from Record record
             where record.user = :user and record.deleted = false
-              and record.operationType in :operationTypes
+              and lower(record.operationType) in :operationTypes
               and (lower(record.operationType) like lower(concat('%', :search, '%'))
                    or lower(record.operationResponse) like lower(concat('%', :search, '%')))
             """)

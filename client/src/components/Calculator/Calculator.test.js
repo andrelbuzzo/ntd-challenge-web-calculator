@@ -28,15 +28,15 @@ describe("Calculator", () => {
     expect(screen.getAllByRole("button").at(-1)).toBeDisabled();
     expect(API.calculate).toHaveBeenCalledWith("+", "2", "3");
 
-    resolveRequest({ data: { result: 5, message: "Operação concluída", userBalance: 9.5 } });
-    expect(await screen.findByText("Operação concluída")).toBeInTheDocument();
+    resolveRequest({ data: { result: 5, message: "Operation completed", userBalance: 9.5 } });
+    expect(await screen.findByText("Operation completed")).toBeInTheDocument();
     expect(screen.getAllByText("5").length).toBeGreaterThan(0);
     expect(onUserChange).toHaveBeenCalledWith({ ...user, balance: 9.5 });
     await waitFor(() => expect(screen.getAllByRole("button").at(-1)).toBeEnabled());
   });
 
   it("shows the API error and re-enables the calculator", async () => {
-    API.calculate.mockRejectedValue({ response: { data: { message: "Saldo insuficiente" } } });
+    API.calculate.mockRejectedValue({ response: { data: { message: "Insufficient balance" } } });
     render(<Calculator user={user} onUserChange={onUserChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "2" }));
@@ -44,7 +44,7 @@ describe("Calculator", () => {
     fireEvent.click(screen.getByRole("button", { name: "3" }));
     fireEvent.click(screen.getByRole("button", { name: "=" }));
 
-    expect(await screen.findByText("Saldo insuficiente")).toBeInTheDocument();
+    expect(await screen.findByText("Insufficient balance")).toBeInTheDocument();
     expect(screen.getAllByRole("button").at(-1)).toBeEnabled();
     expect(onUserChange).not.toHaveBeenCalled();
   });
