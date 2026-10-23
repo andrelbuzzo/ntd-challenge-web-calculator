@@ -83,6 +83,11 @@ English to match the American-company challenge context.
   reduced-motion support.
 - Replaced the footer's descriptive span with accessible LinkedIn and GitHub
   icon links pointing to André Buzzo's profiles.
+- Reworked the Records table to show date, operation, operands, operator,
+  response, balances before/after, cost, and an icon-only delete action.
+- Added record fields for left/right operands, operator, and balance before;
+  new calculator history entries now persist the actual response and full
+  operation context while retaining the legacy `amount` response field.
 - Restored tracked files that contained only line-ending changes; preserved the
   meaningful application diff and the untracked design reference directory.
 
@@ -152,6 +157,9 @@ Runtime smoke checks passed locally:
   the expected user and pagination payloads.
 - The production client served on port `3001` and contained the expected
   `NTD Software - Web Calculator` title and React root.
+
+The Records table/API update also passed the full frontend suite, production
+build, and backend test suite after adding the operation-context fields.
 
 On Windows, use the committed `gradlew.bat` wrapper.
 

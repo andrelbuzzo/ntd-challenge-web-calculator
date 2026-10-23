@@ -65,11 +65,12 @@ public class RecordService {
     }
 
     @Transactional
-    public void save(String operator, User user, BigDecimal amount,
-                     BigDecimal userBalance, String finalResult) {
+    public void save(String operator, User user, BigDecimal leftOperand,
+                     BigDecimal rightOperand, BigDecimal balanceBefore,
+                     BigDecimal balanceAfter, String finalResult) {
         OperationType operationType = operationService.checkOperation(operator);
-        Record record = new Record(operationType.name(), operationType.cost(), user, amount, userBalance,
-                finalResult);
+        Record record = new Record(operationType.name(), leftOperand, operator, rightOperand,
+                operationType.cost(), user, balanceBefore, balanceAfter, finalResult);
         recordRepository.save(record);
     }
 

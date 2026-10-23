@@ -61,7 +61,8 @@ class CalculatorServiceTest {
         assertEquals(0, new BigDecimal("0.20").compareTo(response.getCost()));
         assertEquals(new BigDecimal("0.80"), user.getBalance());
         verify(recordService).save(eq("-"), eq(user), eq(new BigDecimal("-1.0")),
-                eq(new BigDecimal("0.80")), any(String.class));
+                eq(new BigDecimal("-5.0")), eq(new BigDecimal("1.00")),
+                eq(new BigDecimal("0.80")), eq("4.0"));
     }
 
     @Test
@@ -70,7 +71,7 @@ class CalculatorServiceTest {
                 "test@example.com", "6", "0", "/"));
 
         verify(userService, never()).loadUserByUsernameForUpdate(any());
-        verify(recordService, never()).save(any(), any(), any(), any(), any());
+        verify(recordService, never()).save(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -79,7 +80,7 @@ class CalculatorServiceTest {
                 "test@example.com", "-1", "0", "sqrt"));
 
         verify(userService, never()).loadUserByUsernameForUpdate(any());
-        verify(recordService, never()).save(any(), any(), any(), any(), any());
+        verify(recordService, never()).save(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -90,6 +91,6 @@ class CalculatorServiceTest {
                 "test@example.com", "2", "3", "-"));
 
         assertEquals(new BigDecimal("0.10"), user.getBalance());
-        verify(recordService, never()).save(any(), any(), any(), any(), any());
+        verify(recordService, never()).save(any(), any(), any(), any(), any(), any(), any());
     }
 }

@@ -66,6 +66,7 @@ public class CalculatorService implements Calculator {
         validateOperands(left, right, operationType);
 
         User user = userService.loadUserByUsernameForUpdate(username);
+        BigDecimal balanceBefore = user.getBalance().setScale(2, RoundingMode.HALF_EVEN);
         BigDecimal balance = debit(user, operationType);
         Double result = calculateResult(left, right, operation);
 
@@ -73,8 +74,9 @@ public class CalculatorService implements Calculator {
                 left, right, operation, result, Constants.OPERATION_SUCCESSFUL);
         response.setUserBalance(balance);
         response.setCost(operationType.cost());
-        recordService.save(operation, user, BigDecimal.valueOf(left), balance,
-                response.toString());
+        recordService.save(operation, user, BigDecimal.valueOf(left),
+                operationType == OperationType.SQUARE_ROOT ? null : BigDecimal.valueOf(right),
+                balanceBefore, balance, String.valueOf(result));
         log.info("Operation completed user={}, type={}, balance={}", username, operationType, balance);
         return response;
     }
@@ -83,6 +85,7 @@ public class CalculatorService implements Calculator {
     public CalculatorModel generateString(String username) {
         OperationType operationType = OperationType.RANDOM_STRING;
         User user = userService.loadUserByUsernameForUpdate(username);
+        BigDecimal balanceBefore = user.getBalance().setScale(2, RoundingMode.HALF_EVEN);
         BigDecimal balance = debit(user, operationType);
         String result = stringGenerationService.generateString();
 
@@ -90,7 +93,7 @@ public class CalculatorService implements Calculator {
                 operationType.name(), null, result);
         response.setUserBalance(balance);
         response.setCost(operationType.cost());
-        recordService.save("random_string", user, null, balance, result);
+        recordService.save("random_string", user, null, null, balanceBefore, balance, result);
         return response;
     }
 

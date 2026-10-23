@@ -7,7 +7,11 @@ import java.util.UUID;
 public record RecordResponse(
         UUID id,
         String operationType,
+        BigDecimal leftOperand,
+        String operator,
+        BigDecimal rightOperand,
         BigDecimal amount,
+        BigDecimal balanceBefore,
         BigDecimal cost,
         BigDecimal userBalance,
         String operationResponse,
@@ -17,7 +21,11 @@ public record RecordResponse(
         return new RecordResponse(
                 record.getId(),
                 record.getOperationType(),
+                record.getLeftOperand(),
+                record.getOperator(),
+                record.getRightOperand(),
                 record.getAmount(),
+                record.getBalanceBefore(),
                 record.getCost(),
                 record.getUserBalance(),
                 record.getOperationResponse(),
