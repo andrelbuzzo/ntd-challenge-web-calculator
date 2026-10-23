@@ -13,6 +13,16 @@ const api = axios.create({
   baseURL: "/api/v1"
 });
 
+const serializeOperationTypes = (operationTypes, operationType) => {
+  const values = Array.isArray(operationTypes)
+    ? operationTypes
+    : operationTypes ? [operationTypes] : operationType ? [operationType] : [];
+  const normalized = values.flatMap((value) => String(value).split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return normalized.length ? normalized.join(",") : undefined;
+};
+
 api.interceptors.request.use((config) => {
   const user = getStoredUser();
   if (user?.token) {
@@ -39,9 +49,10 @@ const API = {
   }),
   generateString: () => api.get("/generate-string"),
   records: ({ page = 0, size = 10, search = "", operationTypes = [], operationType = "", sort = "createdAt,desc" } = {}) => api.get("/records", {
-    params: { page, size, search: search || undefined, operationType: operationTypes.length ? operationTypes.join(",") : (operationType || undefined), sort }
+    params: { page, size, search: search || undefined, operationType: serializeOperationTypes(operationTypes, operationType), sort }
   }),
-  deleteRecord: (id) => api.delete("/records", { params: { id } })
+  deleteRecord: (id) => api.delete("/records", { params: { id } }),
+  undeleteRecord: (id) => api.patch("/records/undelete", null, { params: { id } })
 };
 
 export default API;

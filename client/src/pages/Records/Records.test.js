@@ -34,12 +34,12 @@ describe("Records", () => {
 
   it("fetches and renders records, then searches with the entered text", async () => {
     renderRecords();
-    expect(screen.getByText("Carregando...")).toBeInTheDocument();
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
     expect(await screen.findByText("ADDITION")).toBeInTheDocument();
     expect(API.records).toHaveBeenCalledWith({ page: 0, search: "", sort: "createdAt,desc" });
 
-    fireEvent.change(screen.getByRole("textbox", { name: "Buscar registros" }), { target: { value: "addition" } });
-    fireEvent.click(screen.getByRole("button", { name: "Buscar" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Search records" }), { target: { value: "addition" } });
+    fireEvent.click(screen.getByRole("button", { name: "Search" }));
     await waitFor(() => expect(API.records).toHaveBeenLastCalledWith({ page: 0, search: "addition", sort: "createdAt,desc" }));
   });
 
@@ -47,7 +47,7 @@ describe("Records", () => {
     renderRecords();
     expect(await screen.findByText("ADDITION")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
     await waitFor(() => expect(API.deleteRecord).toHaveBeenCalledWith("r1"));
     await waitFor(() => expect(API.records).toHaveBeenCalledWith({ page: 0, search: "", sort: "createdAt,desc" }));
     expect(window.confirm).toHaveBeenCalled();
@@ -58,14 +58,14 @@ describe("Records", () => {
     renderRecords();
     await screen.findByText("ADDITION");
 
-    fireEvent.click(screen.getByRole("button", { name: "Próxima" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await waitFor(() => expect(API.records).toHaveBeenCalledWith({ page: 1, search: "", sort: "createdAt,desc" }));
   });
 
   it("shows a fetch error", async () => {
-    API.records.mockRejectedValue({ response: { data: { message: "Histórico indisponível" } } });
+    API.records.mockRejectedValue({ response: { data: { message: "History unavailable" } } });
     renderRecords();
-    expect(await screen.findByText("Histórico indisponível")).toBeInTheDocument();
+    expect(await screen.findByText("History unavailable")).toBeInTheDocument();
   });
 
   it("sends multiple selected operation types to the API", async () => {

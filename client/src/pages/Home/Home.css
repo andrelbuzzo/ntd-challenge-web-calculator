@@ -1,18 +1,16 @@
-
-.page-shell { max-width: 1120px; padding: 52px 24px 70px; width: 100%; }
-.home-aside { padding: 52px 12px 0 34px; }
-.home-aside h2 { color: #292622; font-size: 1.7rem; line-height: 1.15; margin: 10px 0 12px; }
-.tip-row { align-items: center; border-top: 1px solid #e6e2dc; display: flex; gap: 14px; margin-top: 20px; padding-top: 14px; }.tip-row span { color: #b85c3b; font-size: .75rem; font-weight: 700; }.tip-row p { color: #4d4842; font-size: .88rem; margin: 0; }
+.page-shell { max-width: 1120px; padding: 20px 24px; width: 100%; }
+.home-aside { padding: 0 12px 38px; }
+.home-aside .eyebrow { font-size: .92rem; }
+.home-aside h2 { color: #292622; font-size: 2.2rem; line-height: 1.15; margin: 12px 0 16px; }
+.balance-summary { border-left: 4px solid #b85c3b; display: grid; gap: 4px; margin: 0 0 22px; padding: 12px 0 12px 16px; }.balance-summary span { color: #777067; font-size: 1rem; }.balance-summary strong { color: #292622; font-size: 2.1rem; font-variant-numeric: tabular-nums; line-height: 1; }
+.home-aside .muted-copy { font-size: 1.08rem; }
+.tip-row { align-items: center; border-top: 1px solid #e6e2dc; display: flex; gap: 16px; margin-top: 10px; padding-top: 10px; }.tip-row span { color: #b85c3b; font-size: 1rem; font-weight: 700; }.tip-row p { color: #4d4842; font-size: 1.08rem; margin: 0; }
 
 #application header,
 #application footer {
   text-align: center;
-  color: white;
 }
 
-#application footer {
-  margin-top: 50px;
-}
 #application footer h4 a {
   margin-right: 20px;
   font-size: 32pt;
@@ -22,7 +20,7 @@
 #calculatorBox {
   border-radius: 10px;
   background-color: white;
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 #calculatorBox button {
@@ -31,11 +29,7 @@
   line-height: 44px;
 }
 
-#calculatorBox button.btn-warning {
-  font-size: 12pt;
-}
-#calculatorBox button.btn-info {
-  font-size: 22pt;
-}
-.loading-state { color: #777067; padding: 80px 24px; text-align: center; }
-@media (max-width: 991px) { .home-aside { padding: 36px 12px; } }
+#calculatorBox button.btn-warning { font-size: 12pt; }
+#calculatorBox button.btn-info { font-size: 22pt; }
+.loading-state { color: #777067; font-size: 1.05rem; padding: 80px 24px; text-align: center; }
+@media (max-width: 991px) { .home-aside { padding: 42px 12px; } }

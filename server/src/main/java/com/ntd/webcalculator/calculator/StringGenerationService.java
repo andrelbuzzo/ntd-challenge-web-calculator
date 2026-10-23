@@ -6,7 +6,7 @@ import org.springframework.web.client.RestClient;
 @Service
 public class StringGenerationService {
 
-	final String STRING_GENERATION_URL = "https://www.random.org/strings/?num=1&len=32&digits=on&upperalpha=on&loweralpha=on&unique=on&format=plain&rnd=new";
+	final String STRING_GENERATION_URL = "https://www.random.org/strings/?num=1&len=20&digits=on&upperalpha=on&loweralpha=on&unique=on&format=plain&rnd=new";
 
 	private final RestClient restClient;
 

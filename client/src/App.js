@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Link, Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login/Login";
 import Home from "./pages/Home";
@@ -43,9 +43,9 @@ const App = () => {
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div id="application">
         <header className="app-header">
-          <Link className="brand" to={loggedIn ? "/home" : "/"}><span className="brand-mark">∑</span><span>Ledger / Calculate</span></Link>
-          {loggedIn && <nav className="app-nav"><Link to="/home">Calculadora</Link><Link to="/records">Histórico</Link></nav>}
-          {loggedIn && <div className="btn-logout"><button className="inputButton" type="button" onClick={handleLogout}>Sign out</button></div>}
+          <Link className="brand" to={loggedIn ? "/home" : "/"}><span className="brand-mark" aria-hidden="true"><i className="fa-solid fa-calculator" /></span><span>NTD Software - Web Calculator</span></Link>
+          {loggedIn && <nav className="app-nav"><NavLink to="/home" className={({ isActive }) => isActive ? "active" : undefined}><i className="fa-solid fa-calculator header-icon" aria-hidden="true" />Calculator</NavLink><NavLink to="/records" className={({ isActive }) => isActive ? "active" : undefined}><i className="fa-solid fa-clock-rotate-left header-icon" aria-hidden="true" />History</NavLink></nav>}
+          {loggedIn && <div className="btn-logout"><button className="header-logout" type="button" onClick={handleLogout}><i className="fa-solid fa-right-from-bracket header-icon" aria-hidden="true" />Sign out</button></div>}
         </header>
         <Routes>
           <Route path="/" element={<Login />} />
@@ -53,7 +53,13 @@ const App = () => {
           <Route path="/records" element={<ProtectedRoute authenticated={loggedIn}><Records /></ProtectedRoute>} />
           <Route path="*" element={<NoMatch />} />
         </Routes>
-        <footer><span>Ledger / Calculate</span><span>Focused arithmetic, recorded clearly.</span></footer>
+        <footer>
+          <span>NTD Software - Web Calculator</span>
+          <nav className="footer-social" aria-label="Social links">
+            <a href="https://www.linkedin.com/in/andre-buzzo" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i className="fa-brands fa-linkedin" aria-hidden="true" /></a>
+            <a href="https://github.com/andrelbuzzo" target="_blank" rel="noreferrer" aria-label="GitHub"><i className="fa-brands fa-github" aria-hidden="true" /></a>
+          </nav>
+        </footer>
       </div>
     </Router>
   );

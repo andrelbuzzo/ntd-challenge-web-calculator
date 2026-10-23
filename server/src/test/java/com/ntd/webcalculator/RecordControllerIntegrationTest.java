@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -96,6 +97,71 @@ class RecordControllerIntegrationTest {
                 .andExpect(jsonPath("$.content[0].operationType", is("ADDITION")));
 
         org.junit.jupiter.api.Assertions.assertFalse(recordRepository.findById(recordA.getId()).orElseThrow().isDeleted());
+    }
+
+    @Test
+    void filtersRepeatedOperationTypesAndReturnsPaginationMetadata() throws Exception {
+        userA = userService.save(new User("A", uniqueUsername("records-filter"), "123456", null));
+        recordA = saveRecord(userA, "ADDITION", "addition response");
+        recordB = saveRecord(userA, "DIVISION", "division response");
+
+        mockMvc.perform(get("/api/v1/records")
+                        .param("operationType", "addition, division")
+                        .param("operationType", "ADDITION")
+                        .param("page", "1")
+                        .param("size", "1")
+                        .param("sort", "operationType,asc")
+                        .header("Authorization", bearer(userA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.size").value(1))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.first").value(false))
+                .andExpect(jsonPath("$.last").value(true))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].operationType").value("DIVISION"));
+    }
+
+    @Test
+    void rejectsUnsupportedOperationTypeFilter() throws Exception {
+        userA = userService.save(new User("A", uniqueUsername("records-invalid-filter"), "123456", null));
+
+        mockMvc.perform(get("/api/v1/records")
+                        .param("operationType", "NOT_AN_OPERATION")
+                        .header("Authorization", bearer(userA)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Unsupported operation type: NOT_AN_OPERATION"));
+    }
+
+    @Test
+    void ownDeleteSoftDeletesRecordFromNormalListings() throws Exception {
+        userA = userService.save(new User("A", uniqueUsername("records-soft-delete"), "123456", null));
+        recordA = saveRecord(userA, "ADDITION", "A response");
+
+        mockMvc.perform(delete("/api/v1/records")
+                        .param("id", recordA.getId().toString())
+                        .header("Authorization", bearer(userA)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/records")
+                        .header("Authorization", bearer(userA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0))
+                .andExpect(jsonPath("$.content", hasSize(0)));
+
+        org.junit.jupiter.api.Assertions.assertTrue(recordRepository.findById(recordA.getId()).orElseThrow().isDeleted());
+
+        mockMvc.perform(patch("/api/v1/records/undelete")
+                        .param("id", recordA.getId().toString())
+                        .header("Authorization", bearer(userA)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/records")
+                        .header("Authorization", bearer(userA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content", hasSize(1)));
     }
 
     private Record saveRecord(User user, String operation, String response) {

@@ -61,7 +61,9 @@ const Login = (props) => {
        else navigate(destination, { replace: true })
     })
     .catch((error) => {
-      const message = error.response?.data?.message || 'Wrong email or password'
+      const message = error.response
+        ? error.response.data?.message || 'Wrong email or password'
+        : 'Unable to reach the API. Start the server on port 8090 and try again.'
       setFormError(message)
     })
     .finally(() => setSubmitting(false))
@@ -69,7 +71,7 @@ const Login = (props) => {
 
   return (
     <main className="login-page"><div className={"box"}>
-      {params.get("notice") === "auth" && <div className="auth-notice" role="status">Você precisa entrar para acessar esse recurso.</div>}
+      {params.get("notice") === "auth" && <div className="auth-notice" role="status">You must sign in to access this resource.</div>}
       <form className={"login-form"} onSubmit={onButtonClick}>
         <p className="eyebrow">PRIVATE WORKSPACE</p><h1>Welcome back.</h1><p className="muted-copy">Sign in to run calculations and keep your activity in one place.</p>
         <label htmlFor="email">Email</label>
