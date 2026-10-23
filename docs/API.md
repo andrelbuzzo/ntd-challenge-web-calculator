@@ -86,6 +86,10 @@ owned by the authenticated user.
 
 Successful list responses contain `content` plus zero-based `page`, effective
 `size`, `totalElements`, `totalPages`, and `first`/`last` pagination metadata.
+Each record in `content` exposes `createdAt`, `operationType`, `leftOperand`,
+`operator`, `rightOperand`, `operationResponse`, `balanceBefore`, `cost`, and
+`userBalance` (the balance after the operation). Legacy `amount` remains in the
+payload as an alias for the left operand for compatibility with existing data.
 
 ## Current user
 

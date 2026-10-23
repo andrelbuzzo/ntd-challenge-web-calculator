@@ -30,6 +30,12 @@ public class Record implements Serializable {
     //	@Enumerated(EnumType.STRING)
     private String operationType; // (addition, subtraction, multiplication, division, square_root, random_string)
 
+    private BigDecimal leftOperand;
+
+    private String operator;
+
+    private BigDecimal rightOperand;
+
     private BigDecimal cost;
 
     @JoinColumn(name = "user_id")
@@ -37,6 +43,8 @@ public class Record implements Serializable {
     private User user;
 
     private BigDecimal amount;
+
+    private BigDecimal balanceBefore;
 
     private BigDecimal userBalance;
 
@@ -51,10 +59,27 @@ public class Record implements Serializable {
     public Record(String operationType, BigDecimal cost, User user, BigDecimal amount,
                   BigDecimal userBalance, String operationResponse) {
         this.operationType = operationType;
+        this.leftOperand = amount;
         this.cost = cost;
         this.user = user;
         this.amount = amount;
         this.userBalance = userBalance;
+        this.operationResponse = operationResponse;
+    }
+
+    public Record(String operationType, BigDecimal leftOperand, String operator,
+                  BigDecimal rightOperand, BigDecimal cost, User user,
+                  BigDecimal balanceBefore, BigDecimal balanceAfter,
+                  String operationResponse) {
+        this.operationType = operationType;
+        this.leftOperand = leftOperand;
+        this.operator = operator;
+        this.rightOperand = rightOperand;
+        this.cost = cost;
+        this.user = user;
+        this.amount = leftOperand;
+        this.balanceBefore = balanceBefore;
+        this.userBalance = balanceAfter;
         this.operationResponse = operationResponse;
     }
 

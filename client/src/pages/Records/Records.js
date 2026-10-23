@@ -5,6 +5,32 @@ import { useNavigate } from "react-router-dom";
 import "./Records.css";
 
 const formatMoney = (value) => Number(value || 0).toFixed(2);
+const formatOptionalMoney = (value) => value == null ? "—" : formatMoney(value);
+const operationLabels = {
+  ADDITION: "Addition",
+  SUBTRACTION: "Subtraction",
+  MULTIPLICATION: "Multiplication",
+  DIVISION: "Division",
+  SQUARE_ROOT: "Square root",
+  RANDOM_STRING: "Random string"
+};
+const operatorLabels = { ADDITION: "+", SUBTRACTION: "−", MULTIPLICATION: "×", DIVISION: "÷", SQUARE_ROOT: "√", RANDOM_STRING: "N", sqrt: "√", random_string: "N" };
+const parseLegacyEquation = (response) => {
+  const match = String(response || "").match(/^Equation \[leftOperand=([^,]+), operation=([^,]+), rightOperand=([^,]+), result=([^\]]+)\]$/);
+  return match ? { leftOperand: match[1], operator: match[2], rightOperand: match[3], response: match[4] } : null;
+};
+
+const getRecordDetails = (record) => {
+  const legacy = parseLegacyEquation(record.operationResponse);
+  const isUnaryOperation = record.operationType === "SQUARE_ROOT";
+  return {
+    leftOperand: record.leftOperand ?? record.amount ?? legacy?.leftOperand,
+    operator: operatorLabels[record.operator] || operatorLabels[record.operationType] || legacy?.operator || record.operator,
+    rightOperand: record.rightOperand ?? (isUnaryOperation ? null : legacy?.rightOperand),
+    response: legacy?.response || record.operationResponse,
+    balanceBefore: record.balanceBefore ?? (record.userBalance != null && record.cost != null ? Number(record.userBalance) + Number(record.cost) : null)
+  };
+};
 
 const Records = () => {
   const navigate = useNavigate();
@@ -60,9 +86,23 @@ const Records = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       <div className="table-wrap">
         {loading ? <div className="loading-state"><Spinner animation="border" size="sm" /> Loading...</div> : data.content.length === 0 ? <div className="empty-state"><strong>No operations found</strong><span>Your next calculations will appear here.</span></div> : (
-          <Table responsive hover>
-            <thead><tr><th>Operation</th><th>Input</th><th>Response</th><th>Cost</th><th>Balance after</th><th>Date</th><th><span className="sr-only">Actions</span></th></tr></thead>
-            <tbody>{data.content.map((record) => <tr key={record.id}><td><span className="operation-pill">{record.operationType}</span></td><td>{record.amount ?? "—"}</td><td className="response-cell">{record.operationResponse}</td><td>{formatMoney(record.cost)}</td><td>{formatMoney(record.userBalance)}</td><td>{record.createdAt ? new Date(record.createdAt).toLocaleString() : "—"}</td><td><Button variant="link" className="delete-link" onClick={() => removeRecord(record.id)}>Delete</Button></td></tr>)}</tbody>
+          <Table responsive hover className="records-table">
+            <thead><tr><th>Date</th><th>Operation</th><th>Left operand</th><th>Operator</th><th>Right operand</th><th>Response</th><th>Balance before</th><th>Cost</th><th>Balance after</th><th><span className="sr-only">Actions</span></th></tr></thead>
+            <tbody>{data.content.map((record) => {
+              const details = getRecordDetails(record);
+              return <tr key={record.id}>
+              <td>{record.createdAt ? new Date(record.createdAt).toLocaleString() : "—"}</td>
+              <td><span className="operation-pill">{operationLabels[record.operationType] || record.operationType || "—"}</span></td>
+              <td className="numeric-cell">{details.leftOperand ?? "—"}</td>
+              <td className="operator-cell">{details.operator || "—"}</td>
+              <td className="numeric-cell">{details.rightOperand ?? "—"}</td>
+              <td className="response-cell">{details.response ?? "—"}</td>
+              <td className="numeric-cell">{formatOptionalMoney(details.balanceBefore)}</td>
+              <td className="numeric-cell">{formatOptionalMoney(record.cost)}</td>
+              <td className="numeric-cell">{formatOptionalMoney(record.userBalance)}</td>
+              <td><Button variant="link" className="delete-link" onClick={() => removeRecord(record.id)} aria-label={`Delete record ${record.id}`} title="Delete record"><i className="fa-solid fa-trash" aria-hidden="true" /></Button></td>
+            </tr>;
+            })}</tbody>
           </Table>
         )}
       </div>
