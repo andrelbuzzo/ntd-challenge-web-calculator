@@ -37,6 +37,7 @@ const Home = ({ history }) => {
         <Col lg={3} className="home-aside">
           <p className="eyebrow">CONSUMPTION TRACKING</p>
           <h2>Your balance follows every calculation.</h2>
+          <div className="balance-summary"><span>Current balance</span><strong>{Number(user.balance || 0).toFixed(2)}</strong></div>
           <p className="muted-copy">Every operation is validated and securely recorded on the server.</p>
           <div className="tip-row"><span>01</span><p>Choose the numbers</p></div>
           <div className="tip-row"><span>02</span><p>Run the operation</p></div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, Spinner } from "react-bootstrap";
 import API from "../../utils/API";
 import "./Calculator.css";
@@ -16,6 +16,17 @@ const Calculator = ({ user, onUserChange }) => {
 
   const currentValue = operator ? right : left;
 
+  useEffect(() => {
+    if (!message && !error) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setMessage("");
+      setError("");
+    }, 4000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [message, error]);
+
   const reset = () => { setLeft(""); setRight(""); setOperator(""); setResult(""); setMessage(""); setError(""); };
 
   const appendValue = (value) => {
@@ -31,6 +42,18 @@ const Calculator = ({ user, onUserChange }) => {
     const current = operator ? right : left;
     if (!current) return;
     setter(current.startsWith("-") ? current.slice(1) : `-${current}`);
+  };
+
+  const removeLastValue = () => {
+    if (operator && !right) {
+      setOperator("");
+      return;
+    }
+
+    const setter = operator ? setRight : setLeft;
+    const current = operator ? right : left;
+    setter(current.slice(0, -1));
+    setError("");
   };
 
   const execute = (selectedOperator = operator, selectedRight = right) => {
@@ -65,13 +88,58 @@ const Calculator = ({ user, onUserChange }) => {
     appendValue(key);
   };
 
+  useEffect(() => {
+    const handleShortcut = (event) => {
+      if (event.target instanceof HTMLElement && ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
+
+      const key = event.key;
+      if (/^[0-9.]$/.test(key) || ["+", "-", "*", "/"].includes(key)) {
+        event.preventDefault();
+        if (!loading) handleKey(key);
+        return;
+      }
+
+      if (["Enter", "="].includes(key)) {
+        event.preventDefault();
+        if (!loading) execute();
+        return;
+      }
+
+      if (key === "Escape") {
+        event.preventDefault();
+        if (!loading) reset();
+        return;
+      }
+
+      if (key === "Backspace") {
+        event.preventDefault();
+        if (!loading) removeLastValue();
+        return;
+      }
+
+      if (key.toLowerCase() === "r") {
+        event.preventDefault();
+        if (!loading) squareRoot();
+        return;
+      }
+
+      if (key.toLowerCase() === "n") {
+        event.preventDefault();
+        if (!loading) generateString();
+      }
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  });
+
   return (
     <section className="calculator-card" aria-labelledby="calcTitle">
-      <div className="calculator-topline"><div><p className="eyebrow">CALCULATOR</p><h1 id="calcTitle">Run a calculation</h1></div><div className="balance-chip"><span>Balance</span><strong>{Number(user.balance || 0).toFixed(2)}</strong></div></div>
+      <h1 className="calculator-title" id="calcTitle">Run a calculation</h1>
       <div className="calculator-display" aria-live="polite"><span className="expression">{left || "0"} {operator} {right}</span><strong>{result || currentValue || "0"}</strong></div>
-      {error && <Alert variant="danger" className="calculator-alert" role="alert">{error}</Alert>}
-      {message && !error && <Alert variant="success" className="calculator-alert" role="status">{message}</Alert>}
-      <div className="calculator-actions"><button type="button" onClick={squareRoot} disabled={loading} aria-label="Calculate square root">√</button><button type="button" onClick={generateString} disabled={loading}>Random string</button><button type="button" className="utility" onClick={reset} disabled={loading}>Clear</button></div>
+      {error && <Alert dismissible onClose={() => setError("")} variant="danger" className="calculator-alert" role="alert">{error}</Alert>}
+      {message && !error && <Alert dismissible onClose={() => setMessage("")} variant="success" className="calculator-alert" role="status">{message}</Alert>}
+      <div className="calculator-actions"><button type="button" onClick={squareRoot} disabled={loading} aria-label="Calculate square root" title="Square root (R)">√</button><button type="button" onClick={generateString} disabled={loading} title="Random string (N)">Random string</button><button type="button" className="utility" onClick={reset} disabled={loading} title="Clear (Escape)">Clear</button></div>
       <div className="keypad">{keys.map((key) => <button type="button" className={`key ${["+", "-", "*", "/"].includes(key) ? "operator-key" : ""}`} aria-label={key === "*" ? "multiply" : key === "/" ? "divide" : key === "±" ? "toggle sign" : key} key={key} onClick={() => handleKey(key)} disabled={loading}>{key}</button>)}<button type="button" className="equals-key" onClick={() => execute()} disabled={loading} aria-label="=">{loading ? <Spinner size="sm" animation="border" /> : "="}</button></div>
     </section>
   );

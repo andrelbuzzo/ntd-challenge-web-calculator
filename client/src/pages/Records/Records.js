@@ -54,7 +54,9 @@ const Records = () => {
           <option value="createdAt,desc">Most recent</option><option value="createdAt,asc">Oldest</option><option value="cost,desc">Highest cost</option><option value="cost,asc">Lowest cost</option>
         </Form.Control>
       </div>
-      <fieldset className="operation-filters"><legend>Filter operations</legend>{[["ADDITION","Addition"],["SUBTRACTION","Subtraction"],["MULTIPLICATION","Multiplication"],["DIVISION","Division"],["SQUARE_ROOT","Square root"],["RANDOM_STRING","Random string"]].map(([value, label]) => <label key={value}><input type="checkbox" checked={operationTypes.includes(value)} onChange={() => setOperationTypes((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value])} /> {label}</label>)}</fieldset>
+      <fieldset className="operation-filters">
+          {[["ADDITION","Addition"],["SUBTRACTION","Subtraction"],["MULTIPLICATION","Multiplication"],["DIVISION","Division"],["SQUARE_ROOT","Square root"],["RANDOM_STRING","Random string"]].map(([value, label]) => <label key={value}><input type="checkbox" checked={operationTypes.includes(value)} onChange={() => setOperationTypes((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value])} /> {label}</label>)}
+      </fieldset>
       {error && <Alert variant="danger">{error}</Alert>}
       <div className="table-wrap">
         {loading ? <div className="loading-state"><Spinner animation="border" size="sm" /> Loading...</div> : data.content.length === 0 ? <div className="empty-state"><strong>No operations found</strong><span>Your next calculations will appear here.</span></div> : (

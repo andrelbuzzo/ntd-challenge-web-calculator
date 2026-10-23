@@ -61,7 +61,9 @@ const Login = (props) => {
        else navigate(destination, { replace: true })
     })
     .catch((error) => {
-      const message = error.response?.data?.message || 'Wrong email or password'
+      const message = error.response
+        ? error.response.data?.message || 'Wrong email or password'
+        : 'Unable to reach the API. Start the server on port 8090 and try again.'
       setFormError(message)
     })
     .finally(() => setSubmitting(false))

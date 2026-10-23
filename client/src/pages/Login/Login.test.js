@@ -64,4 +64,20 @@ describe("Login", () => {
     expect(screen.getByDisplayValue("Log in")).toBeEnabled();
     expect(history.replace).not.toHaveBeenCalled();
   });
+
+  it("distinguishes an unavailable API from invalid credentials", async () => {
+    API.login.mockRejectedValue(new Error("Network Error"));
+    render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><Login history={history} /></MemoryRouter>);
+
+    fireEvent.change(screen.getByPlaceholderText("you@example.com"), {
+      target: { value: "user1@ntd.com" }
+    });
+    fireEvent.change(screen.getByPlaceholderText("Password"), {
+      target: { value: "123456" }
+    });
+    fireEvent.submit(screen.getByRole("button", { name: "Log in" }));
+
+    expect(await screen.findByText("Unable to reach the API. Start the server on port 8090 and try again.")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Log in")).toBeEnabled();
+  });
 });

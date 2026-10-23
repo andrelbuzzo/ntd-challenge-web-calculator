@@ -7,8 +7,8 @@
 
 - Date: October 23, 2026
 - Branch: `feature/session-hardening`
-- Base commit: `a21a197` (`feat(frontend): modernize calculator and records`)
-- Iteration: session hardening, Records contract, repository hygiene, and runtime verification
+- Base commit: `d56c67e` (`feat(app): harden sessions and records contract`)
+- Iteration: calculator alert/footer polish after authentication, readability, and navigation pass
 
 ## Current objective
 
@@ -27,7 +27,7 @@ English to match the American-company challenge context.
 - Updated accessibility labels, confirmation messages, empty/loading states,
   table headings, sorting labels, operation filters, and pagination controls.
 - Updated frontend fixtures and assertions to match the English UI/API messages.
-- Updated the browser title and PWA manifest name to `Ledger / Calculate`.
+- Updated the browser title and PWA manifest name to `NTD Software - Web Calculator`.
 - Preserved API paths, DTO fields, persisted enum values, and database-facing
   identifiers such as `ADDITION` and `SQUARE_ROOT`.
 - Added consistent `/home` handling for expired sessions, including storage
@@ -41,6 +41,48 @@ English to match the American-company challenge context.
   updated contract.
 - Corrected the client undelete request to send the record id as a query
   parameter in Axios config rather than as a request body.
+- Made calculator alerts overlay the card instead of changing its layout height.
+- Increased UI text sizes, header height, control sizing, and responsive spacing
+  across the calculator, home, login, and records surfaces.
+- Added keyboard calculator shortcuts for digits, decimal point, operators,
+  Enter/Equals, Escape, Backspace, square root (`R`), and random string (`N`).
+- Added calculator tests covering keyboard calculation, clear, square root, and
+  random-string shortcuts.
+- Verified the local H2 database starts successfully and contains the seeded
+  development users; direct and client-proxy login both returned `200`.
+- Improved login error handling so an unavailable API is no longer reported as
+  invalid credentials, and added regression coverage for the network-failure
+  message.
+- Increased typography, button heights, spacing, and header dimensions again
+  across the calculator actions/keypad, home aside, app header, and Records
+  page after a readability review.
+- Stopped the React development server and Spring Boot/Gradle runtime after
+  verification; ports `3001` and `8090` are closed.
+- Increased all header label sizes and added accessible Font Awesome icons to
+  the brand mark, Calculator link, History link, and Sign out button.
+- Moved the live balance into the Home page's `CONSUMPTION TRACKING` block and
+  removed the calculator top-line wrapper.
+- Forced calculator alerts above Bootstrap's `.fade` opacity rule so errors and
+  success messages remain visible without changing calculator layout height.
+- Pinned the footer to the viewport bottom with the application flex layout and
+  `margin-top: auto`.
+- Renamed the visible application branding to `NTD Software - Web Calculator`
+  based on the challenge PDF.
+- Added automatic four-second dismissal and manual close controls to calculator
+  Bootstrap alerts.
+- Kept calculator controls square while applying bordered, rounded controls to
+  login, navigation, records, and other non-calculator actions.
+- Rounded login inputs/buttons and the header sign-out control to 5px, and
+  switched Calculator/History to `NavLink` active styling for selected-state
+  feedback.
+- Corrected the Bootstrap alert close control: it now has an explicit in-layout
+  36px hit area, centered `×` icon, focus/hover state, and reserved text space;
+  added a regression test for manual dismissal.
+- Repositioned calculator alerts as centered fixed overlays aligned to the
+  responsive header's vertical midpoint, with a short entrance animation and
+  reduced-motion support.
+- Replaced the footer's descriptive span with accessible LinkedIn and GitHub
+  icon links pointing to André Buzzo's profiles.
 - Restored tracked files that contained only line-ending changes; preserved the
   meaningful application diff and the untracked design reference directory.
 
@@ -67,8 +109,14 @@ CI=true npm test -- --watchAll=false --runInBand
 npm run build
 ```
 
-Result: 6 test suites passed, 17 tests passed, and the production build
-compiled successfully.
+Result: 6 test suites passed, 22 tests passed, and the production build
+compiled successfully after the alert/footer changes.
+
+The calculator readability, shortcut, login error-handling, alert positioning,
+and footer-link changes passed the full frontend verification on October 23,
+2026. The development client
+served the updated app successfully on port `3001`, and the local API served on
+port `8090` with H2 and completed a real login/proxy smoke check.
 
 Expected non-blocking warnings include the deprecated Create React App toolchain,
 an outdated Browserslist database, and React Router future-flag warnings in
@@ -103,7 +151,7 @@ Runtime smoke checks passed locally:
 - Authenticated `/api/v1/users/me` and `/api/v1/records` returned `200` with
   the expected user and pagination payloads.
 - The production client served on port `3001` and contained the expected
-  `Ledger / Calculate` title and React root.
+  `NTD Software - Web Calculator` title and React root.
 
 On Windows, use the committed `gradlew.bat` wrapper.
 
@@ -119,9 +167,11 @@ On Windows, use the committed `gradlew.bat` wrapper.
 
 ## Next steps
 
-1. Keep the ignored dependency/build artifacts and untracked design reference
+1. Review and commit the current calculator, readability, login error handling,
+   alert positioning, and footer-link changes on the current feature branch.
+2. Keep the ignored dependency/build artifacts and untracked design reference
    material out of version control unless explicitly requested.
-2. Revisit CI once GitHub Actions quota is available, as tracked in
+3. Revisit CI once GitHub Actions quota is available, as tracked in
    `docs/TECHNICAL_DEBT.md`.
 
 ## Maintenance policy
