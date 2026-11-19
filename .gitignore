@@ -42,3 +42,6 @@ client/build/
 *.mv.db
 *.trace.db
 *.pdf
+
+# material de referencia (ver HANDOFF.md: fora do Git)
+client/design.md/
